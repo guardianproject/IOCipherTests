@@ -1,6 +1,7 @@
 package info.guardianproject.test.iocipher;
 
 import android.test.AndroidTestCase;
+import android.util.Log;
 import info.guardianproject.iocipher.File;
 
 public class FileTest extends AndroidTestCase {
@@ -13,6 +14,11 @@ public class FileTest extends AndroidTestCase {
 	}
 	public void testExists() {
 		File f = new File("");
-		assertFalse(f.exists());
+		try {
+			assertFalse(f.exists());
+		} catch (ExceptionInInitializerError e) {
+			Log.e("IOCipherTests", e.getCause().toString());
+			assertFalse(true);
+		}
 	}
 }
