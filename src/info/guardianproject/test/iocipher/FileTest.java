@@ -5,6 +5,9 @@ import android.test.AndroidTestCase;
 import android.util.Log;
 
 public class FileTest extends AndroidTestCase {
+	private final static String TAG = "AndroidTestCase";
+	
+	private java.io.File app_tmp;
 
 	protected void setUp() {
 		
@@ -17,7 +20,7 @@ public class FileTest extends AndroidTestCase {
 		try {
 			assertFalse(f.exists());
 		} catch (ExceptionInInitializerError e) {
-			Log.e("IOCipherTests", e.getCause().toString());
+			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
 		}
 	}
@@ -26,7 +29,7 @@ public class FileTest extends AndroidTestCase {
 		try {
 			assertTrue(f.isDirectory());
 		} catch (ExceptionInInitializerError e) {
-			Log.e("IOCipherTests", e.getCause().toString());
+			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
 		}
 	}
@@ -35,7 +38,7 @@ public class FileTest extends AndroidTestCase {
 		try {
 			assertFalse(f.isFile());
 		} catch (ExceptionInInitializerError e) {
-			Log.e("IOCipherTests", e.getCause().toString());
+			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
 		}
 	}
@@ -44,7 +47,7 @@ public class FileTest extends AndroidTestCase {
 		try {
 			assertTrue(f.isAbsolute());
 		} catch (ExceptionInInitializerError e) {
-			Log.e("IOCipherTests", e.getCause().toString());
+			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
 		}
 	}
@@ -54,7 +57,7 @@ public class FileTest extends AndroidTestCase {
 		try {
 			assertTrue(f.mkdir());
 		} catch (ExceptionInInitializerError e) {
-			Log.e("IOCipherTests", e.getCause().toString());
+			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
 		}
 	}
