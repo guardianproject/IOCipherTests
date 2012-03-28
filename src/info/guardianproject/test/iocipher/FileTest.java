@@ -95,10 +95,27 @@ public class FileTest extends AndroidTestCase {
 	public void testMkdirRename() {
 		File f = new File("/mkdir-to-rename");
 		try {
-			assertTrue(f.mkdir());
-			assertTrue(f.renameTo(new File("/renamed")));
-			assertTrue(new File("/renamed").exists());
+			f.mkdir();
+			f.renameTo(new File("/renamed"));
 			assertFalse(new File("/mkdir-to-rename").exists());
+			assertTrue(new File("/renamed").exists());
+		} catch (ExceptionInInitializerError e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		}
+	}
+
+	public void testMkdirList() {
+		File root = new File("/");
+		File f = new File("/mkdir-to-list");
+		try {
+			f.mkdir();
+			final String[] files = root.list();
+			for (String filename : files) {
+				Log.i(TAG, "testMkdirList file: " + filename);
+			}
+			assertTrue(files.length > 2); // it should always give us "." and
+											// ".."
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
