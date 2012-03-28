@@ -121,4 +121,21 @@ public class FileTest extends AndroidTestCase {
 			assertFalse(true);
 		}
 	}
+
+	public void testMkdirMtime() {
+		File f = new File("/mkdir-with-mtime");
+		long faketime = 1000000000;
+		try {
+			f.mkdir();
+			Log.i(TAG, "f.lastModified: " + Long.toString(f.lastModified()));
+			f.setLastModified(faketime);
+			long time = f.lastModified();
+			Log.i(TAG, "f.lastModified after setting: " + Long.toString(time));
+			assertTrue(time == faketime);
+		} catch (ExceptionInInitializerError e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		}
+	}
+
 }
