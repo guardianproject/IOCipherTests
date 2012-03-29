@@ -36,6 +36,42 @@ public class FileTest extends AndroidTestCase {
 		}
 	}
 
+	public void testGetFreeSpace() {
+		File f = new File("");
+		try {
+			long free = f.getFreeSpace();
+			Log.i(TAG, "f.getFreeSpace: " + Long.toString(free));
+			assertTrue(free > 0);
+		} catch (ExceptionInInitializerError e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		}
+	}
+
+	public void testGetUsableSpace() {
+		File f = new File("");
+		try {
+			long total = f.getUsableSpace();
+			Log.i(TAG, "f.getUsableSpace: " + Long.toString(total));
+			assertTrue(total > 0);
+		} catch (ExceptionInInitializerError e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		}
+	}
+
+	public void testGetTotalSpace() {
+		File f = new File("");
+		try {
+			long total = f.getTotalSpace();
+			Log.i(TAG, "f.getTotalSpace: " + Long.toString(total));
+			assertTrue(total > 0);
+		} catch (ExceptionInInitializerError e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		}
+	}
+
 	public void testMkdirExists() {
 		File f = new File("/test.iocipher.dir."
 				+ Integer.toString((int) (Math.random() * 1024)));
@@ -105,6 +141,17 @@ public class FileTest extends AndroidTestCase {
 		}
 	}
 
+	public void testMkdirIsDirectory() {
+		File f = new File("/mkdir-to-test");
+		try {
+			f.mkdir();
+			assertTrue(f.isDirectory());
+		} catch (ExceptionInInitializerError e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		}
+	}
+
 	public void testMkdirList() {
 		File root = new File("/");
 		File f = new File("/mkdir-to-list");
@@ -122,9 +169,26 @@ public class FileTest extends AndroidTestCase {
 		}
 	}
 
+	public void testMkdirLastModified() {
+		File root = new File("/");
+		File f = new File("/test.iocipher.dir."
+				+ Integer.toString((int) (Math.random() * 1024)));
+		try {
+			long lasttime = root.lastModified();
+			Log.i(TAG, "f.lastModified: " + Long.toString(lasttime));
+			f.mkdir();
+			long thistime = root.lastModified();
+			Log.i(TAG, "f.lastModified after setting: " + Long.toString(thistime));
+			assertTrue(thistime > lasttime);
+		} catch (ExceptionInInitializerError e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		}
+	}
+
 	public void testMkdirMtime() {
 		File f = new File("/mkdir-with-mtime");
-		long faketime = 1000000000;
+		long faketime = 1000000000L;
 		try {
 			f.mkdir();
 			Log.i(TAG, "f.lastModified: " + Long.toString(f.lastModified()));
