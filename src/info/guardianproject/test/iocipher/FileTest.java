@@ -9,16 +9,14 @@ import android.util.Log;
 public class FileTest extends AndroidTestCase {
 	private final static String TAG = "FileTest";
 
-	private java.io.File app_vfs;
 	private VirtualFileSystem vfs;
 
 	protected void setUp() {
-		java.io.File db = new java.io.File(app_vfs, "sqlcipherfs.db");
+		java.io.File db = new java.io.File(mContext.getDir("vfs",
+				Context.MODE_PRIVATE).getAbsoluteFile(), "sqlcipherfs.db");
 		if (db.exists())
 			db.delete();
-		app_vfs = mContext.getDir("vfs", Context.MODE_PRIVATE)
-				.getAbsoluteFile();
-		vfs = new VirtualFileSystem(app_vfs.getAbsolutePath());
+		vfs = new VirtualFileSystem(db.getAbsolutePath());
 		vfs.mount();
 	}
 
@@ -177,6 +175,13 @@ public class FileTest extends AndroidTestCase {
 		}
 	}
 
+	/*
+	 * public void testCreateFile() { File f = new File("/TESTFILE." +
+	 * Integer.toString((int) (Math.random() * Integer.MAX_VALUE))); try {
+	 * assertFalse(f.exists()); //f.createNewFile(); assertTrue(f.isFile()); }
+	 * catch (Exception e) { Log.e(TAG, e.getCause().toString());
+	 * assertFalse(true); } }
+	 */
 	public void testMkdirList() {
 		File root = new File("/");
 		File f = new File("/mkdir-to-list");
@@ -203,7 +208,8 @@ public class FileTest extends AndroidTestCase {
 			Log.i(TAG, "f.lastModified: " + Long.toString(lasttime));
 			f.mkdir();
 			long thistime = root.lastModified();
-			Log.i(TAG, "f.lastModified after setting: " + Long.toString(thistime));
+			Log.i(TAG,
+					"f.lastModified after setting: " + Long.toString(thistime));
 			assertTrue(thistime > lasttime);
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());

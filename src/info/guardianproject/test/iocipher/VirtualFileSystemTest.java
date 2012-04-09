@@ -9,16 +9,14 @@ import android.util.Log;
 public class VirtualFileSystemTest extends AndroidTestCase {
 	private final static String TAG = "VirtualFileSystemTest";
 
-	private java.io.File app_vfs;
 	private VirtualFileSystem vfs;
 
 	protected void setUp() {
-		java.io.File db = new java.io.File(app_vfs, "sqlcipherfs.db");
+		java.io.File db = new java.io.File(mContext.getDir("vfs",
+				Context.MODE_PRIVATE).getAbsoluteFile(), "sqlcipherfs.db");
 		if (db.exists())
 			db.delete();
-		app_vfs = mContext.getDir("vfs", Context.MODE_PRIVATE)
-				.getAbsoluteFile();
-		vfs = new VirtualFileSystem(app_vfs.getAbsolutePath());
+		vfs = new VirtualFileSystem(db.getAbsolutePath());
 	}
 
 	protected void tearDown() {
