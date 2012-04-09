@@ -85,6 +85,31 @@ public class FileTest extends AndroidTestCase {
 		}
 	}
 
+	public void testMkdirs() {
+		File f0 = new File("/"
+				+ Integer.toString((int) (Math.random() * Integer.MAX_VALUE)));
+		File f1 = new File(f0,
+				Integer.toString((int) (Math.random() * Integer.MAX_VALUE)));
+		File f2 = new File(f1,
+				Integer.toString((int) (Math.random() * Integer.MAX_VALUE)));
+		Log.i(TAG, "f2: " + f2.getAbsolutePath());
+		try {
+			f2.mkdirs();
+			for (String f : f0.list()) {
+				Log.i(TAG, "file in f0: " + f);
+			}
+			for (String f : f1.list()) {
+				Log.i(TAG, "file in f1: " + f);
+			}
+			assertTrue(f0.exists());
+			assertTrue(f1.exists());
+			assertTrue(f2.exists());
+		} catch (ExceptionInInitializerError e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		}
+	}
+
 	public void testSlashIsDirectory() {
 		File f = new File("/");
 		try {
@@ -172,7 +197,7 @@ public class FileTest extends AndroidTestCase {
 	public void testMkdirLastModified() {
 		File root = new File("/");
 		File f = new File("/test.iocipher.dir."
-				+ Integer.toString((int) (Math.random() * 1024)));
+				+ Integer.toString((int) (Math.random() * Integer.MAX_VALUE)));
 		try {
 			long lasttime = root.lastModified();
 			Log.i(TAG, "f.lastModified: " + Long.toString(lasttime));
