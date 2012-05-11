@@ -1,7 +1,11 @@
 package info.guardianproject.test.iocipher;
 
 import info.guardianproject.iocipher.File;
+import info.guardianproject.iocipher.FileOutputStream;
 import info.guardianproject.iocipher.VirtualFileSystem;
+
+import java.io.IOException;
+
 import android.content.Context;
 import android.test.AndroidTestCase;
 import android.util.Log;
@@ -228,6 +232,53 @@ public class FileTest extends AndroidTestCase {
 			Log.i(TAG, "f.lastModified after setting: " + Long.toString(time));
 			assertTrue(time == faketime);
 		} catch (ExceptionInInitializerError e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		}
+	}
+
+	public void testCreateNewFile() {
+		File root = new File("/");
+		File f = new File("/testCreateNewFile."
+				+ Integer.toString((int) (Math.random() * Integer.MAX_VALUE)));
+		try {
+			assertFalse(f.exists());
+			f.createNewFile();
+			assertTrue(f.exists());
+			assertTrue(f.isFile());
+			final String[] files = root.list();
+			for (String filename : files) {
+				Log.i(TAG, "testCreateNewFile file: " + filename);
+			}
+		} catch (ExceptionInInitializerError e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		} catch (IOException e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		}
+	}
+
+	public void testWriteNewFile() {
+		File root = new File("/");
+		File f = new File("/testWriteNewFile."
+				+ Integer.toString((int) (Math.random() * Integer.MAX_VALUE)));
+		try {
+			assertTrue(root.isDirectory());
+			assertFalse(f.exists());
+			FileOutputStream out = new FileOutputStream(f);
+			out.write(123);
+			out.close();
+			assertTrue(f.exists());
+			assertTrue(f.isFile());
+			final String[] files = root.list();
+			for (String filename : files) {
+				Log.i(TAG, "testWriteNewFile file: " + filename);
+			}
+		} catch (ExceptionInInitializerError e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		} catch (IOException e) {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
 		}
