@@ -1,6 +1,7 @@
 package info.guardianproject.test.iocipher;
 
 import info.guardianproject.iocipher.File;
+import info.guardianproject.iocipher.FileInputStream;
 import info.guardianproject.iocipher.FileOutputStream;
 import info.guardianproject.iocipher.VirtualFileSystem;
 
@@ -275,6 +276,32 @@ public class FileTest extends AndroidTestCase {
 			for (String filename : files) {
 				Log.i(TAG, "testWriteNewFile file: " + filename);
 			}
+		} catch (ExceptionInInitializerError e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		} catch (IOException e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		}
+	}
+
+	public void testWriteByteInNewFileThenRead() {
+		byte testValue = 43;
+		File root = new File("/");
+		File f = new File("/testWriteNewFile."
+				+ Integer.toString((int) (Math.random() * Integer.MAX_VALUE)));
+		try {
+			assertTrue(root.isDirectory());
+			assertFalse(f.exists());
+			FileOutputStream out = new FileOutputStream(f);
+			out.write(testValue);
+			out.close();
+			assertTrue(f.exists());
+			assertTrue(f.isFile());
+			FileInputStream in = new FileInputStream(f);
+			int b = in.read();
+			Log.i(TAG, "read: " + Integer.toString(b));
+			assertTrue(b == testValue);
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
