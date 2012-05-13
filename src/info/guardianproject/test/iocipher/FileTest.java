@@ -3,8 +3,10 @@ package info.guardianproject.test.iocipher;
 import info.guardianproject.iocipher.File;
 import info.guardianproject.iocipher.FileInputStream;
 import info.guardianproject.iocipher.FileOutputStream;
+import info.guardianproject.iocipher.FileWriter;
 import info.guardianproject.iocipher.VirtualFileSystem;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 
 import android.content.Context;
@@ -302,6 +304,32 @@ public class FileTest extends AndroidTestCase {
 			int b = in.read();
 			Log.i(TAG, "read: " + Integer.toString(b));
 			assertTrue(b == testValue);
+		} catch (ExceptionInInitializerError e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		} catch (IOException e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		}
+	}
+
+	public void testWriteTextInNewFileThenReadByByte() {
+		String testString = "this is a test of IOCipher!";
+		File f = new File("/testAWriteTextInNewFileThenReadByByte."
+				+ Integer.toString((int) (Math.random() * Integer.MAX_VALUE)));
+		try {
+			assertFalse(f.exists());
+			BufferedWriter out = new BufferedWriter(new FileWriter(f));
+			out.write(testString);
+			out.close();
+			assertTrue(f.exists());
+			assertTrue(f.isFile());
+			FileInputStream in = new FileInputStream(f);
+			byte[] data = new byte[testString.length()];
+			in.read(data, 0, data.length);
+			String dataString = new String(data);
+			Log.i(TAG, "read: " + dataString);
+			assertTrue(dataString.equals(testString));
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
