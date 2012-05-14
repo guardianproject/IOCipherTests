@@ -315,7 +315,7 @@ public class FileTest extends AndroidTestCase {
 
 	public void testWriteTextInNewFileThenReadByByte() {
 		String testString = "this is a test of IOCipher!";
-		File f = new File("/testAWriteTextInNewFileThenReadByByte."
+		File f = new File("/testWriteTextInNewFileThenReadByByte."
 				+ Integer.toString((int) (Math.random() * Integer.MAX_VALUE)));
 		try {
 			assertFalse(f.exists());
@@ -339,4 +339,29 @@ public class FileTest extends AndroidTestCase {
 		}
 	}
 
+	public void testWriteTextInNewFileThenReadIntoByteArray() {
+		String testString = "this is a test of IOCipher!";
+		File f = new File("/testWriteTextInNewFileThenReadIntoByteArray."
+				+ Integer.toString((int) (Math.random() * Integer.MAX_VALUE)));
+		try {
+			assertFalse(f.exists());
+			BufferedWriter out = new BufferedWriter(new FileWriter(f));
+			out.write(testString);
+			out.close();
+			assertTrue(f.exists());
+			assertTrue(f.isFile());
+			FileInputStream in = new FileInputStream(f);
+			byte[] data = new byte[testString.length()];
+			int ret = in.read(data);
+			assertTrue(ret == data.length);
+			String dataString = new String(data);
+			assertTrue(dataString.equals(testString));
+		} catch (ExceptionInInitializerError e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		} catch (IOException e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		}
+	}
 }
