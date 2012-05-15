@@ -4,6 +4,7 @@ import info.guardianproject.iocipher.File;
 import info.guardianproject.iocipher.FileInputStream;
 import info.guardianproject.iocipher.FileOutputStream;
 import info.guardianproject.iocipher.FileWriter;
+import info.guardianproject.iocipher.IOCipherFileChannel;
 import info.guardianproject.iocipher.VirtualFileSystem;
 
 import java.io.BufferedWriter;
@@ -392,6 +393,29 @@ public class FileTest extends AndroidTestCase {
 			String dataString = new String(data);
 			Log.i(TAG, "read: " + dataString);
 			assertTrue(dataString.equals(testString));
+		} catch (ExceptionInInitializerError e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		} catch (IOException e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		}
+	}
+
+	public void testWriteTextInNewFileThenCheckSize() {
+		String testString = "01234567890abcdefgh";
+		File f = new File("/testWriteTextInNewFileThenCheckSize."
+				+ Integer.toString((int) (Math.random() * Integer.MAX_VALUE)));
+		try {
+			assertFalse(f.exists());
+			BufferedWriter out = new BufferedWriter(new FileWriter(f));
+			out.write(testString);
+			out.close();
+			assertTrue(f.exists());
+			assertTrue(f.isFile());
+			FileInputStream in = new FileInputStream(f);
+			IOCipherFileChannel channel = in.getChannel();
+			assertTrue(channel.size() == testString.length());
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
