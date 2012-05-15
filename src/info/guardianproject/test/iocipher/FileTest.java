@@ -3,10 +3,12 @@ package info.guardianproject.test.iocipher;
 import info.guardianproject.iocipher.File;
 import info.guardianproject.iocipher.FileInputStream;
 import info.guardianproject.iocipher.FileOutputStream;
+import info.guardianproject.iocipher.FileReader;
 import info.guardianproject.iocipher.FileWriter;
 import info.guardianproject.iocipher.IOCipherFileChannel;
 import info.guardianproject.iocipher.VirtualFileSystem;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
@@ -416,6 +418,57 @@ public class FileTest extends AndroidTestCase {
 			FileInputStream in = new FileInputStream(f);
 			IOCipherFileChannel channel = in.getChannel();
 			assertTrue(channel.size() == testString.length());
+		} catch (ExceptionInInitializerError e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		} catch (IOException e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		}
+	}
+
+	public void testWriteTextInNewFileThenFileInputStream() {
+		String testString = "01234567890abcdefgh";
+		File f = new File("/testWriteTextInNewFileThenFileInputStream."
+				+ Integer.toString((int) (Math.random() * Integer.MAX_VALUE)));
+		try {
+			assertFalse(f.exists());
+			BufferedWriter out = new BufferedWriter(new FileWriter(f));
+			out.write(testString);
+			out.close();
+			assertTrue(f.exists());
+			assertTrue(f.isFile());
+			BufferedReader in = new BufferedReader(new FileReader(f));
+			String tmp = in.readLine();
+			Log.e(TAG, "in.readline(): " + tmp);
+			assertTrue(testString.equals(tmp));
+		} catch (ExceptionInInitializerError e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		} catch (IOException e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		}
+	}
+
+	public void testWriteManyLinesInNewFileThenFileInputStream() {
+		String testString = "01234567890abcdefghijklmnopqrstuvwxyz";
+		File f = new File("/testWriteManyLinesInNewFileThenFileInputStream."
+				+ Integer.toString((int) (Math.random() * Integer.MAX_VALUE)));
+		try {
+			assertFalse(f.exists());
+			BufferedWriter out = new BufferedWriter(new FileWriter(f));
+			for(int i=0; i<25; i++)
+				out.write(testString + "\n");
+			out.close();
+			assertTrue(f.exists());
+			assertTrue(f.isFile());
+			BufferedReader in = new BufferedReader(new FileReader(f));
+			for(int i=0; i<25; i++) {
+				String tmp = in.readLine();
+				Log.e(TAG, "in.readline(): " + tmp);
+				assertTrue(testString.equals(tmp));
+			}
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
