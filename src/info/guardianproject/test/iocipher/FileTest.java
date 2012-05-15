@@ -364,4 +364,41 @@ public class FileTest extends AndroidTestCase {
 			assertFalse(true);
 		}
 	}
+
+	public void testWriteTextInNewFileThenReadOneByteByByte() {
+		String testString = "01234567890abcdefgh";
+		File f = new File("/testWriteTextInNewFileThenReadOneByteByByte."
+				+ Integer.toString((int) (Math.random() * Integer.MAX_VALUE)));
+		try {
+			assertFalse(f.exists());
+			BufferedWriter out = new BufferedWriter(new FileWriter(f));
+			out.write(testString);
+			out.close();
+			assertTrue(f.exists());
+			assertTrue(f.isFile());
+			FileInputStream in = new FileInputStream(f);
+			byte[] data = new byte[testString.length()];
+			int ret = 0;
+			int i = 0;
+			while (i < data.length) {
+				ret = in.read();
+				if (ret != -1) {
+					data[i] = (byte)ret;
+					i++;
+				} else {
+					break;
+				}
+			}
+			String dataString = new String(data);
+			Log.i(TAG, "read: " + dataString);
+			assertTrue(dataString.equals(testString));
+		} catch (ExceptionInInitializerError e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		} catch (IOException e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		}
+	}
+
 }
