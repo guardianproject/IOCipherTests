@@ -162,20 +162,71 @@ public class FileTest extends AndroidTestCase {
 	}
 
 /*
-// TODO testMkdirRename fails
+// TODO libsqlfs does not support renaming directories
 	public void testMkdirRename() {
-		File f = new File("/mkdir-to-rename");
+		String dir = "/mkdir-to-rename";
+		String newdir = "/renamed";
+		String firstfile = "first-file";
+		File root = new File("/");
+		File d = new File(dir);
+		File newd = new File(newdir);
 		try {
-			f.mkdir();
-			f.renameTo(new File("/renamed"));
-			assertFalse(new File("/mkdir-to-rename").exists());
-			assertTrue(new File("/renamed").exists());
+			d.mkdir();
+			File f1 = new File(d, firstfile);
+			f1.createNewFile();
+			assertTrue(f1.exists());
+			String[] files = d.list();
+			for (String filename : files) {
+				Log.i(TAG, "testMkdirList " + dir + ": " + filename);
+			}
+			assertTrue(d.renameTo(newd));
+			assertTrue(new File(newd, firstfile).exists());
+			File f2 = new File(newd, "second-file");
+			f2.createNewFile();
+			files = root.list();
+			for (String filename : files) {
+				Log.i(TAG, "testMkdirList root: " + filename);
+			}
+			files = newd.list();
+			for (String filename : files) {
+				Log.i(TAG, "testMkdirList " + newdir + ": " + filename);
+			}
+			assertFalse(d.exists());
+			assertTrue(newd.exists());
+			assertTrue(f2.exists());
 		} catch (ExceptionInInitializerError e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		} catch (IOException e) {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
 		}
 	}
 */
+
+	public void testNewFileRename() {
+		File root = new File("/");
+		File f = new File("/testNewFileRename-NEW."
+				+ Integer.toString((int) (Math.random() * Integer.MAX_VALUE)));
+		File newf = new File("/testNewFileRename-RENAMED."
+				+ Integer.toString((int) (Math.random() * Integer.MAX_VALUE)));
+		try {
+			f.createNewFile();
+			assertTrue(f.renameTo(newf));
+			final String[] files = root.list();
+			for (String filename : files) {
+				Log.i(TAG, "testNewFileRename file: " + filename);
+			}
+			assertFalse(f.exists());
+			assertTrue(newf.exists());
+		} catch (ExceptionInInitializerError e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		} catch (IOException e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		}
+	}
 
 	public void testMkdirIsDirectory() {
 		File f = new File("/mkdir-to-test");
