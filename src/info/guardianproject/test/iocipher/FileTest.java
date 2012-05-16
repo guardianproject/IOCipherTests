@@ -23,10 +23,17 @@ public class FileTest extends AndroidTestCase {
 
 	protected void setUp() {
 		java.io.File db = new java.io.File(mContext.getDir("vfs",
-				Context.MODE_PRIVATE).getAbsoluteFile(), "sqlcipherfs.db");
+				Context.MODE_PRIVATE).getAbsoluteFile(), TAG + ".db");
 		if (db.exists())
 			db.delete();
-		vfs = new VirtualFileSystem(db.getAbsolutePath());
+		Log.v(TAG, "database file: " + db.getAbsolutePath());
+		if (db.exists())
+			Log.v(TAG, "exists: " + db.getAbsolutePath());
+		try {
+			vfs = new VirtualFileSystem(db.getAbsolutePath());
+		} catch (Exception e) {
+			Log.e(TAG, e.toString());
+		}
 		vfs.mount();
 	}
 
