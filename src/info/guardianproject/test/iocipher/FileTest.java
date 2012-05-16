@@ -479,6 +479,37 @@ public class FileTest extends AndroidTestCase {
 		}
 	}
 
+	public void testWriteTextInNewFileThenSkipAndRead() {
+		String testString = "01234567890abcdefghijklmnopqrstuvxyz";
+		File f = new File("/testWriteTextInNewFileThenSkipAndRead."
+				+ Integer.toString((int) (Math.random() * Integer.MAX_VALUE)));
+		try {
+			assertFalse(f.exists());
+			BufferedWriter out = new BufferedWriter(new FileWriter(f));
+			out.write(testString);
+			out.close();
+			assertTrue(f.exists());
+			assertTrue(f.isFile());
+			FileInputStream in = new FileInputStream(f);
+			char c = (char)in.read();
+			assertTrue(c == testString.charAt(0));
+			in.skip(5);
+			c = (char)in.read();
+			Log.e(TAG, "c: " + c + "  testString.charAt(6): " + testString.charAt(6));
+			assertTrue(c == testString.charAt(6));
+			in.skip(20);
+			c = (char)in.read();
+			Log.e(TAG, "c: " + c + "  testString.charAt(27): " + testString.charAt(27));
+			assertTrue(c == testString.charAt(27));
+		} catch (ExceptionInInitializerError e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		} catch (IOException e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		}
+	}
+
 	public void testWriteTextInNewFileThenFileInputStream() {
 		String testString = "01234567890abcdefgh";
 		File f = new File("/testWriteTextInNewFileThenFileInputStream."
