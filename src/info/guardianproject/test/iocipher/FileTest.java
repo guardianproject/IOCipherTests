@@ -469,6 +469,7 @@ public class FileTest extends AndroidTestCase {
 			FileInputStream in = new FileInputStream(f);
 			IOCipherFileChannel channel = in.getChannel();
 			assertTrue(channel.size() == testString.length());
+			assertTrue(testString.length() == f.length());
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
