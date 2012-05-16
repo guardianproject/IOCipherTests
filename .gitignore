@@ -1,5 +1,11 @@
+# Android build products
 bin/
 gen/
+# Android local config
+ant.properties
+build.xml
+coverage.em
+local.properties
 # Mac OS X detritus
 .DS_Store
 
