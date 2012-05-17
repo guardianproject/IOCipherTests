@@ -34,7 +34,7 @@ public class FileTest extends AndroidTestCase {
 		} catch (Exception e) {
 			Log.e(TAG, e.toString());
 		}
-		vfs.mount();
+		vfs.mount("this is my secure password");
 	}
 
 	protected void tearDown() {
