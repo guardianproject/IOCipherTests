@@ -168,6 +168,17 @@ public class FileTest extends AndroidTestCase {
 		}
 	}
 
+	public void testARenameDirFailure() {
+		File d = new File("/dir-to-rename");
+		try {
+			d.mkdir();
+			assertFalse(d.renameTo(new File("/somethingelse")));
+		} catch (ExceptionInInitializerError e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		}
+	}
+
 /*
 // TODO libsqlfs does not support renaming directories
 	public void testMkdirRename() {
