@@ -40,8 +40,24 @@ public class VirtualFileSystemTest extends AndroidTestCase {
 		} else {
 			Log.i(TAG, "vfs is NOT mounted");
 		}
-		File f = new File("/test");
-		assertTrue(f.mkdir());
+		File d = new File("/test");
+		assertTrue(d.mkdir());
+		vfs.unmount();
+	}
+
+	public void testMountCreateUnmountMountExists() {
+		vfs.mount();
+		File f = new File("/testMountCreateUnmountMountExists."
+				+ Integer.toString((int) (Math.random() * 1024)));
+		try {
+			f.createNewFile();
+		} catch (Exception e) {
+			Log.e(TAG, "cannot create " + f.getPath());
+			assertFalse(true);
+		}
+		vfs.unmount();
+		vfs.mount();
+		assertTrue(f.exists());
 		vfs.unmount();
 	}
 }
