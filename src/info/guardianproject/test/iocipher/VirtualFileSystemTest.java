@@ -60,4 +60,20 @@ public class VirtualFileSystemTest extends AndroidTestCase {
 		assertTrue(f.exists());
 		vfs.unmount();
 	}
+
+	public void testMountKeyWithBadPassword() {
+		vfs.mount("this is my password");
+		File d = new File("/");
+		for (String f : d.list()) {
+			Log.v(TAG, "file: " + f);
+		}
+		vfs.unmount();
+		try {
+			vfs.mount("this is the WRONG password");
+		} catch (Exception e) {
+			assertTrue(true);
+		} finally {
+			vfs.unmount();
+		}
+	}
 }
