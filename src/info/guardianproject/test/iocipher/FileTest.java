@@ -29,11 +29,7 @@ public class FileTest extends AndroidTestCase {
 		Log.v(TAG, "database file: " + db.getAbsolutePath());
 		if (db.exists())
 			Log.v(TAG, "exists: " + db.getAbsolutePath());
-		try {
-			vfs = new VirtualFileSystem(db.getAbsolutePath());
-		} catch (Exception e) {
-			Log.e(TAG, e.toString());
-		}
+		vfs = new VirtualFileSystem(db.getAbsolutePath());
 		vfs.mount("this is my secure password");
 	}
 

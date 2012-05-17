@@ -16,11 +16,7 @@ public class VirtualFileSystemTest extends AndroidTestCase {
 				Context.MODE_PRIVATE).getAbsoluteFile(), TAG + ".db");
 		if (db.exists())
 			db.delete();
-		try {
-			vfs = new VirtualFileSystem(db.getAbsolutePath());
-		} catch (Exception e) {
-			Log.e(TAG, e.toString());
-		}
+		vfs = new VirtualFileSystem(db.getAbsolutePath());
 	}
 
 	protected void tearDown() {
