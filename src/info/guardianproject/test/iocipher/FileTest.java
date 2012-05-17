@@ -135,6 +135,28 @@ public class FileTest extends AndroidTestCase {
 		}
 	}
 
+	public void testCanReadSlash() {
+		File f = new File("/");
+		try {
+			assertTrue(f.isDirectory());
+			assertTrue(f.canRead());
+		} catch (ExceptionInInitializerError e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		}
+	}
+
+	public void testCanWriteSlash() {
+		File f = new File("/");
+		try {
+			assertTrue(f.isDirectory());
+			assertTrue(f.canWrite());
+		} catch (ExceptionInInitializerError e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		}
+	}
+
 	public void testSlashIsFile() {
 		File f = new File("/");
 		try {
