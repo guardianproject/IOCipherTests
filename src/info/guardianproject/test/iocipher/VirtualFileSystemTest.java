@@ -28,21 +28,21 @@ public class VirtualFileSystemTest extends AndroidTestCase {
 
 	public void testInitMountUnmount() {
 		vfs.mount();
-		if (vfs.isOpen()) {
-			Log.i(TAG, "vfs is open");
+		if (vfs.isMounted()) {
+			Log.i(TAG, "vfs is mounted");
 		} else {
-			Log.i(TAG, "vfs is NOT open");
+			Log.i(TAG, "vfs is NOT mounted");
 		}
-		assertTrue(vfs.isOpen());
+		assertTrue(vfs.isMounted());
 		vfs.unmount();
 	}
 
 	public void testInitMountMkdirUnmount() {
 		vfs.mount();
-		if (vfs.isOpen()) {
-			Log.i(TAG, "vfs is open");
+		if (vfs.isMounted()) {
+			Log.i(TAG, "vfs is mounted");
 		} else {
-			Log.i(TAG, "vfs is NOT open");
+			Log.i(TAG, "vfs is NOT mounted");
 		}
 		File f = new File("/test");
 		assertTrue(f.mkdir());
