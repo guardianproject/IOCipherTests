@@ -55,7 +55,7 @@ public class FileTest extends AndroidTestCase {
 		File f = new File("");
 		try {
 			long free = f.getFreeSpace();
-			Log.i(TAG, "f.getFreeSpace: " + Long.toString(free));
+			Log.v(TAG, "f.getFreeSpace: " + Long.toString(free));
 			assertTrue(free > 0);
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
@@ -67,7 +67,7 @@ public class FileTest extends AndroidTestCase {
 		File f = new File("");
 		try {
 			long total = f.getUsableSpace();
-			Log.i(TAG, "f.getUsableSpace: " + Long.toString(total));
+			Log.v(TAG, "f.getUsableSpace: " + Long.toString(total));
 			assertTrue(total > 0);
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
@@ -79,7 +79,7 @@ public class FileTest extends AndroidTestCase {
 		File f = new File("");
 		try {
 			long total = f.getTotalSpace();
-			Log.i(TAG, "f.getTotalSpace: " + Long.toString(total));
+			Log.v(TAG, "f.getTotalSpace: " + Long.toString(total));
 			assertTrue(total > 0);
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
@@ -107,14 +107,14 @@ public class FileTest extends AndroidTestCase {
 				Integer.toString((int) (Math.random() * Integer.MAX_VALUE)));
 		File f2 = new File(f1,
 				Integer.toString((int) (Math.random() * Integer.MAX_VALUE)));
-		Log.i(TAG, "f2: " + f2.getAbsolutePath());
+		Log.v(TAG, "f2: " + f2.getAbsolutePath());
 		try {
 			f2.mkdirs();
 			for (String f : f0.list()) {
-				Log.i(TAG, "file in f0: " + f);
+				Log.v(TAG, "file in f0: " + f);
 			}
 			for (String f : f1.list()) {
-				Log.i(TAG, "file in f1: " + f);
+				Log.v(TAG, "file in f1: " + f);
 			}
 			assertTrue(f0.exists());
 			assertTrue(f1.exists());
@@ -195,7 +195,7 @@ public class FileTest extends AndroidTestCase {
 			assertTrue(f1.exists());
 			String[] files = d.list();
 			for (String filename : files) {
-				Log.i(TAG, "testMkdirList " + dir + ": " + filename);
+				Log.v(TAG, "testMkdirList " + dir + ": " + filename);
 			}
 			assertTrue(d.renameTo(newd));
 			assertTrue(new File(newd, firstfile).exists());
@@ -203,11 +203,11 @@ public class FileTest extends AndroidTestCase {
 			f2.createNewFile();
 			files = root.list();
 			for (String filename : files) {
-				Log.i(TAG, "testMkdirList root: " + filename);
+				Log.v(TAG, "testMkdirList root: " + filename);
 			}
 			files = newd.list();
 			for (String filename : files) {
-				Log.i(TAG, "testMkdirList " + newdir + ": " + filename);
+				Log.v(TAG, "testMkdirList " + newdir + ": " + filename);
 			}
 			assertFalse(d.exists());
 			assertTrue(newd.exists());
@@ -233,7 +233,7 @@ public class FileTest extends AndroidTestCase {
 			assertTrue(f.renameTo(newf));
 			final String[] files = root.list();
 			for (String filename : files) {
-				Log.i(TAG, "testNewFileRename file: " + filename);
+				Log.v(TAG, "testNewFileRename file: " + filename);
 			}
 			assertFalse(f.exists());
 			assertTrue(newf.exists());
@@ -264,10 +264,10 @@ public class FileTest extends AndroidTestCase {
 			f.mkdir();
 			final String[] files = root.list();
 			for (String filename : files) {
-				Log.i(TAG, "testMkdirList file: " + filename);
+				Log.v(TAG, "testMkdirList file: " + filename);
 			}
 			assertTrue(files.length > 2); // it should always give us "." and
-											// ".."
+			// ".."
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
@@ -282,7 +282,7 @@ public class FileTest extends AndroidTestCase {
 				+ Integer.toString((int) (Math.random() * Integer.MAX_VALUE)));
 		try {
 			long lasttime = root.lastModified();
-			Log.i(TAG, "f.lastModified: " + Long.toString(lasttime));
+			Log.v(TAG, "f.lastModified: " + Long.toString(lasttime));
 			f.mkdir();
 			long thistime = root.lastModified();
 			Log.i(TAG,
@@ -300,10 +300,10 @@ public class FileTest extends AndroidTestCase {
 		long faketime = 1000000000L;
 		try {
 			f.mkdir();
-			Log.i(TAG, "f.lastModified: " + Long.toString(f.lastModified()));
+			Log.v(TAG, "f.lastModified: " + Long.toString(f.lastModified()));
 			f.setLastModified(faketime);
 			long time = f.lastModified();
-			Log.i(TAG, "f.lastModified after setting: " + Long.toString(time));
+			Log.v(TAG, "f.lastModified after setting: " + Long.toString(time));
 			assertTrue(time == faketime);
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
@@ -323,7 +323,7 @@ public class FileTest extends AndroidTestCase {
 			assertTrue(f.isFile());
 			final String[] files = root.list();
 			for (String filename : files) {
-				Log.i(TAG, "testCreateNewFile file: " + filename);
+				Log.v(TAG, "testCreateNewFile file: " + filename);
 			}
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
@@ -348,7 +348,7 @@ public class FileTest extends AndroidTestCase {
 			assertTrue(f.isFile());
 			final String[] files = root.list();
 			for (String filename : files) {
-				Log.i(TAG, "testWriteNewFile file: " + filename);
+				Log.v(TAG, "testWriteNewFile file: " + filename);
 			}
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
@@ -374,7 +374,7 @@ public class FileTest extends AndroidTestCase {
 			assertTrue(f.isFile());
 			FileInputStream in = new FileInputStream(f);
 			int b = in.read();
-			Log.i(TAG, "read: " + Integer.toString(b));
+			Log.v(TAG, "read: " + Integer.toString(b));
 			assertTrue(b == testValue);
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
@@ -400,7 +400,7 @@ public class FileTest extends AndroidTestCase {
 			byte[] data = new byte[testString.length()];
 			in.read(data, 0, data.length);
 			String dataString = new String(data);
-			Log.i(TAG, "read: " + dataString);
+			Log.v(TAG, "read: " + dataString);
 			assertTrue(dataString.equals(testString));
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
@@ -455,14 +455,14 @@ public class FileTest extends AndroidTestCase {
 			while (i < data.length) {
 				ret = in.read();
 				if (ret != -1) {
-					data[i] = (byte)ret;
+					data[i] = (byte) ret;
 					i++;
 				} else {
 					break;
 				}
 			}
 			String dataString = new String(data);
-			Log.i(TAG, "read: " + dataString);
+			Log.v(TAG, "read: " + dataString);
 			assertTrue(dataString.equals(testString));
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
@@ -509,15 +509,17 @@ public class FileTest extends AndroidTestCase {
 			assertTrue(f.exists());
 			assertTrue(f.isFile());
 			FileInputStream in = new FileInputStream(f);
-			char c = (char)in.read();
+			char c = (char) in.read();
 			assertTrue(c == testString.charAt(0));
 			in.skip(5);
-			c = (char)in.read();
-			Log.e(TAG, "c: " + c + "  testString.charAt(6): " + testString.charAt(6));
+			c = (char) in.read();
+			Log.v(TAG, "c: " + c + "  testString.charAt(6): "
+							+ testString.charAt(6));
 			assertTrue(c == testString.charAt(6));
 			in.skip(20);
-			c = (char)in.read();
-			Log.e(TAG, "c: " + c + "  testString.charAt(27): " + testString.charAt(27));
+			c = (char) in.read();
+			Log.v(TAG,"c: " + c + "  testString.charAt(27): "
+							+ testString.charAt(27));
 			assertTrue(c == testString.charAt(27));
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
@@ -541,7 +543,7 @@ public class FileTest extends AndroidTestCase {
 			assertTrue(f.isFile());
 			BufferedReader in = new BufferedReader(new FileReader(f));
 			String tmp = in.readLine();
-			Log.e(TAG, "in.readline(): " + tmp);
+			Log.v(TAG, "in.readline(): " + tmp);
 			assertTrue(testString.equals(tmp));
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
@@ -559,15 +561,15 @@ public class FileTest extends AndroidTestCase {
 		try {
 			assertFalse(f.exists());
 			BufferedWriter out = new BufferedWriter(new FileWriter(f));
-			for(int i=0; i<25; i++)
+			for (int i = 0; i < 25; i++)
 				out.write(testString + "\n");
 			out.close();
 			assertTrue(f.exists());
 			assertTrue(f.isFile());
 			BufferedReader in = new BufferedReader(new FileReader(f));
-			for(int i=0; i<25; i++) {
+			for (int i = 0; i < 25; i++) {
 				String tmp = in.readLine();
-				Log.e(TAG, "in.readline(): " + tmp);
+				Log.v(TAG, "in.readline(): " + tmp);
 				assertTrue(testString.equals(tmp));
 			}
 		} catch (ExceptionInInitializerError e) {
