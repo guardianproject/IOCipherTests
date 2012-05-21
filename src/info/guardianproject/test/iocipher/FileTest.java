@@ -548,6 +548,30 @@ public class FileTest extends AndroidTestCase {
 		}
 	}
 
+	public void testAWriteSkipWrite() {
+		int i, repeat = 1000;
+		String testString = "01234567890abcdefghijklmnopqrstuvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\n";
+		File f = new File("/testAWriteSkipWrite."
+				+ Integer.toString((int) (Math.random() * Integer.MAX_VALUE)));
+		try {
+			assertFalse(f.exists());
+			BufferedWriter out = new BufferedWriter(new FileWriter(f));
+			for (i = 0; i< repeat ; i++)
+				out.write(testString);
+			out.close();
+			assertTrue(f.exists());
+			assertTrue(f.isFile());
+			Log.v(TAG, f.toString() + ".length(): " + f.length() + " " + testString.length() * repeat);
+			assertTrue(f.length() == testString.length() * repeat);
+		} catch (ExceptionInInitializerError e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		} catch (IOException e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		}
+	}
+
 	public void testWriteTextInNewFileThenFileInputStream() {
 		String testString = "01234567890abcdefgh";
 		File f = new File("/testWriteTextInNewFileThenFileInputStream."
