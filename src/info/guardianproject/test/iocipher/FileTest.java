@@ -10,7 +10,14 @@ import info.guardianproject.iocipher.VirtualFileSystem;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.Formatter;
+import java.util.Random;
 
 import android.content.Context;
 import android.test.AndroidTestCase;
@@ -21,6 +28,7 @@ public class FileTest extends AndroidTestCase {
 
 	private VirtualFileSystem vfs;
 
+	@Override
 	protected void setUp() {
 		java.io.File db = new java.io.File(mContext.getDir("vfs",
 				Context.MODE_PRIVATE).getAbsoluteFile(), TAG + ".db");
@@ -29,10 +37,15 @@ public class FileTest extends AndroidTestCase {
 		Log.v(TAG, "database file: " + db.getAbsolutePath());
 		if (db.exists())
 			Log.v(TAG, "exists: " + db.getAbsolutePath());
+		if (!db.canRead())
+			Log.v(TAG, "can't read: " + db.getAbsolutePath());
+		if (!db.canWrite())
+			Log.v(TAG, "can't write: " + db.getAbsolutePath());
 		vfs = new VirtualFileSystem(db.getAbsolutePath());
 		vfs.mount("this is my secure password");
 	}
 
+	@Override
 	protected void tearDown() {
 		vfs.unmount();
 	}
@@ -615,6 +628,99 @@ public class FileTest extends AndroidTestCase {
 				Log.v(TAG, "in.readline(): " + tmp);
 				assertTrue(testString.equals(tmp));
 			}
+		} catch (ExceptionInInitializerError e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		} catch (IOException e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		}
+	}
+
+	private boolean writeRandomBytes(int bytes, String filename) {
+		try {
+			File f = new File(filename);
+			FileOutputStream out = new FileOutputStream(f);
+
+			Random prng = new Random();
+			byte[] random_buf = new byte[bytes];
+			prng.nextBytes(random_buf);
+
+			out.write(random_buf);
+			out.close();
+
+		} catch (IOException e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		}
+		return true;
+	}
+
+	private byte[] digest(File f) {
+		try {
+			MessageDigest md = MessageDigest.getInstance("SHA-1");
+			FileInputStream fstr = new FileInputStream(f);
+			DigestInputStream dstr = new DigestInputStream(fstr, md);
+
+			// read to EOF, really Java? *le sigh*
+			while (dstr.read() != -1);
+
+			dstr.close();
+			return md.digest();
+		} catch (NoSuchAlgorithmException e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		} catch (FileNotFoundException e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		} catch (IOException e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		}
+		return null;
+	}
+
+	private static String toHex(byte[] digest) {
+        Formatter formatter = new Formatter();
+        for (byte b : digest) {
+            formatter.format("%02x", b);
+        }
+        return formatter.toString();
+    }
+
+
+	public void testCopyFileChannels() {
+		String input_name = "/testCopyFileChannels-input";
+		String output_name = "/testCopyFileChannels-output";
+		writeRandomBytes(1000, input_name);
+		File inputFile = new File(input_name);
+		File outputFile = new File(output_name);
+
+		try {
+			assertTrue(inputFile.exists());
+			assertTrue(inputFile.isFile());
+
+			assertFalse(outputFile.exists());
+
+			FileInputStream source = new FileInputStream(inputFile);
+			FileOutputStream destination = new FileOutputStream(output_name);
+	        IOCipherFileChannel sourceFileChannel = source.getChannel();
+	        IOCipherFileChannel destinationFileChannel = destination.getChannel();
+
+	        sourceFileChannel.transferTo(0, sourceFileChannel.size(), destinationFileChannel);
+	        sourceFileChannel.close();
+	        destinationFileChannel.close();
+
+	        assertTrue(outputFile.exists());
+			assertTrue(outputFile.isFile());
+			assertEquals(inputFile.length(), outputFile.length());
+
+			byte[] expected = digest(inputFile);
+			byte[] actual = digest(outputFile);
+
+			Log.i(TAG, "file hashes:" + toHex(expected) +"    "+ toHex(actual));
+			assertTrue( Arrays.equals(expected, actual));
+
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
