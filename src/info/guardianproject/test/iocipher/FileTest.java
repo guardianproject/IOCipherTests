@@ -689,7 +689,7 @@ public class FileTest extends AndroidTestCase {
     }
 
 
-	public void testCopyFileChannels() {
+	public void testFileChannelTransferTo() {
 		String input_name = "/testCopyFileChannels-input";
 		String output_name = "/testCopyFileChannels-output";
 		writeRandomBytes(1000, input_name);
@@ -708,6 +708,47 @@ public class FileTest extends AndroidTestCase {
 	        IOCipherFileChannel destinationFileChannel = destination.getChannel();
 
 	        sourceFileChannel.transferTo(0, sourceFileChannel.size(), destinationFileChannel);
+	        sourceFileChannel.close();
+	        destinationFileChannel.close();
+
+	        assertTrue(outputFile.exists());
+			assertTrue(outputFile.isFile());
+			assertEquals(inputFile.length(), outputFile.length());
+
+			byte[] expected = digest(inputFile);
+			byte[] actual = digest(outputFile);
+
+			Log.i(TAG, "file hashes:" + toHex(expected) +"    "+ toHex(actual));
+			assertTrue( Arrays.equals(expected, actual));
+
+		} catch (ExceptionInInitializerError e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		} catch (IOException e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		}
+	}
+
+	public void testFileChannelTransferFrom() {
+		String input_name = "/testCopyFileChannels-input";
+		String output_name = "/testCopyFileChannels-output";
+		writeRandomBytes(1000, input_name);
+		File inputFile = new File(input_name);
+		File outputFile = new File(output_name);
+
+		try {
+			assertTrue(inputFile.exists());
+			assertTrue(inputFile.isFile());
+
+			assertFalse(outputFile.exists());
+
+			FileInputStream source = new FileInputStream(inputFile);
+			FileOutputStream destination = new FileOutputStream(output_name);
+	        IOCipherFileChannel sourceFileChannel = source.getChannel();
+	        IOCipherFileChannel destinationFileChannel = destination.getChannel();
+
+	        destinationFileChannel.transferFrom(sourceFileChannel, 0, sourceFileChannel.size());
 	        sourceFileChannel.close();
 	        destinationFileChannel.close();
 
