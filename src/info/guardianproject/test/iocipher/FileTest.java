@@ -197,9 +197,11 @@ public class FileTest extends AndroidTestCase {
 		}
 	}
 
-/*
-// TODO libsqlfs does not support renaming directories
+
 	public void testMkdirRename() {
+		// TODO libsqlfs does not support renaming directories
+		fail("TODO libsqlfs does not support renaming directories");
+		/*
 		String dir = "/mkdir-to-rename";
 		String newdir = "/renamed";
 		String firstfile = "first-file";
@@ -236,9 +238,8 @@ public class FileTest extends AndroidTestCase {
 		} catch (IOException e) {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
-		}
+		}*/
 	}
-*/
 
 	public void testNewFileRename() {
 		File root = new File("/");
