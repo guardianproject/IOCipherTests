@@ -771,4 +771,43 @@ public class FileTest extends AndroidTestCase {
 		}
 	}
 
+	public void testWriteByteInExistingFileThenRead() {
+		byte testValue = 43;
+		byte secondTestValue = 100;
+		File root = new File("/");
+		File f = new File("/testWriteExistingFile."
+				+ Integer.toString((int) (Math.random() * Integer.MAX_VALUE)));
+		try {
+			assertTrue(root.isDirectory());
+			assertFalse(f.exists());
+			FileOutputStream out = new FileOutputStream(f);
+			out.write(testValue);
+			out.close();
+			assertTrue(f.exists());
+			assertTrue(f.isFile());
+			FileInputStream in = new FileInputStream(f);
+			int b = in.read();
+			in.close();
+			Log.v(TAG, "read: " + Integer.toString(b));
+			assertTrue(b == testValue);
+
+			// now overwrite
+			out = new FileOutputStream(f);
+			out.write(secondTestValue);
+			out.close();
+			assertTrue(f.exists());
+			assertTrue(f.isFile());
+			in = new FileInputStream(f);
+			b = in.read();
+			in.close();
+			assertTrue(b == secondTestValue);
+		} catch (ExceptionInInitializerError e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		} catch (IOException e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		}
+	}
+
 }
