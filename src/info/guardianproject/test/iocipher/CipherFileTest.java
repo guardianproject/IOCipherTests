@@ -22,6 +22,7 @@ import java.util.Random;
 
 import android.content.Context;
 import android.test.AndroidTestCase;
+import android.test.suitebuilder.annotation.SmallTest;
 import android.util.Log;
 
 public class CipherFileTest extends AndroidTestCase {
@@ -788,6 +789,27 @@ public class CipherFileTest extends AndroidTestCase {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
 		} catch (IOException e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		}
+	}
+	@SmallTest
+	public void testFileExistingTruncate() {
+		String name = randomFileName("testFileExistingTruncate");
+		writeRandomBytes(500, name);
+
+		File f = new File(name);
+		assertEquals(500, f.length());
+
+		try {
+			FileOutputStream out = new FileOutputStream(f);
+			out.close();
+			assertEquals(0, f.length());
+		} catch (FileNotFoundException e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
 		}
