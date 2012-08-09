@@ -6,6 +6,7 @@ import info.guardianproject.iocipher.FileOutputStream;
 import info.guardianproject.iocipher.FileReader;
 import info.guardianproject.iocipher.FileWriter;
 import info.guardianproject.iocipher.IOCipherFileChannel;
+import info.guardianproject.iocipher.RandomAccessFile;
 import info.guardianproject.iocipher.VirtualFileSystem;
 
 import java.io.BufferedReader;
@@ -562,10 +563,10 @@ public class FileTest extends AndroidTestCase {
 		}
 	}
 
-	public void testAWriteSkipWrite() {
+	public void testWriteRepeat() {
 		int i, repeat = 1000;
 		String testString = "01234567890abcdefghijklmnopqrstuvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\n";
-		File f = new File("/testAWriteSkipWrite."
+		File f = new File("/testWriteRepeat."
 				+ Integer.toString((int) (Math.random() * Integer.MAX_VALUE)));
 		try {
 			assertFalse(f.exists());
@@ -577,6 +578,32 @@ public class FileTest extends AndroidTestCase {
 			assertTrue(f.isFile());
 			Log.v(TAG, f.toString() + ".length(): " + f.length() + " " + testString.length() * repeat);
 			assertTrue(f.length() == testString.length() * repeat);
+		} catch (ExceptionInInitializerError e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		} catch (IOException e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		}
+	}
+
+	public void testWriteSkipWrite() {
+		int skip = 100;
+		String testString = "testWriteSkipWrite0123456789\n";
+		File f = new File("/testWriteSkipWrite."
+				+ Integer.toString((int) (Math.random() * Integer.MAX_VALUE)));
+		try {
+			assertFalse(f.exists());
+			RandomAccessFile inout = new RandomAccessFile(f, "rw");
+			inout.writeBytes(testString);
+			inout.seek(skip);
+			inout.writeBytes(testString);
+			inout.close();
+			assertTrue(f.exists());
+			assertTrue(f.isFile());
+			int inputLength = (testString.length() * 2) + skip;
+			Log.v(TAG, f.toString() + ".length(): " + f.length() + " " + inputLength);
+			assertTrue(f.length() == inputLength);
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
