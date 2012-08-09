@@ -837,4 +837,14 @@ public class FileTest extends AndroidTestCase {
 		}
 	}
 
+	public void testEqualsAndCompareTo() {
+		String filename = "/thisisafile";
+		File f = new File(filename);
+		File dup = new File(filename);
+		File diff = new File("/differentfile");
+		assertTrue(f.equals(dup));
+		assertTrue(f.compareTo(dup) == 0);
+		assertFalse(f.equals(diff));
+		assertTrue(f.compareTo(diff) != 0);
+	}
 }
