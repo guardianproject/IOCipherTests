@@ -29,6 +29,43 @@ public class FileTest extends AndroidTestCase {
 
 	private VirtualFileSystem vfs;
 
+	// Utility methods
+	private String randomFileName(String testName) {
+		String name = null;
+		do {
+			name = "/" + testName + "." + Integer.toString((int) (Math.random() * Integer.MAX_VALUE));
+		} while((new File(name)).exists());
+		return name;
+	}
+
+	private static String toHex(byte[] digest) {
+        Formatter formatter = new Formatter();
+        for (byte b : digest) {
+            formatter.format("%02x", b);
+        }
+        return formatter.toString();
+    }
+
+	private boolean writeRandomBytes(int bytes, String filename) {
+		try {
+			File f = new File(filename);
+			FileOutputStream out = new FileOutputStream(f);
+
+			Random prng = new Random();
+			byte[] random_buf = new byte[bytes];
+			prng.nextBytes(random_buf);
+
+			out.write(random_buf);
+			out.close();
+
+		} catch (IOException e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		}
+		return true;
+	}
+
+
 	@Override
 	protected void setUp() {
 		java.io.File db = new java.io.File(mContext.getDir("vfs",
@@ -257,10 +294,8 @@ public class FileTest extends AndroidTestCase {
 
 	public void testNewFileRename() {
 		File root = new File("/");
-		File f = new File("/testNewFileRename-NEW."
-				+ Integer.toString((int) (Math.random() * Integer.MAX_VALUE)));
-		File newf = new File("/testNewFileRename-RENAMED."
-				+ Integer.toString((int) (Math.random() * Integer.MAX_VALUE)));
+		File f = new File(randomFileName("testNewFileRename-NEW"));
+		File newf = new File(randomFileName("testNewFileRename-RENAMED"));
 		try {
 			f.createNewFile();
 			assertTrue(f.renameTo(newf));
@@ -311,8 +346,7 @@ public class FileTest extends AndroidTestCase {
 // TODO testMkdirLastModified fails
 	public void testMkdirLastModified() {
 		File root = new File("/");
-		File f = new File("/test.iocipher.dir."
-				+ Integer.toString((int) (Math.random() * Integer.MAX_VALUE)));
+		File f = new File(randomFileName("test.iocipher.dir"));
 		try {
 			long lasttime = root.lastModified();
 			Log.v(TAG, "f.lastModified: " + Long.toString(lasttime));
@@ -347,8 +381,7 @@ public class FileTest extends AndroidTestCase {
 
 	public void testCreateNewFile() {
 		File root = new File("/");
-		File f = new File("/testCreateNewFile."
-				+ Integer.toString((int) (Math.random() * Integer.MAX_VALUE)));
+		File f = new File(randomFileName("testCreateNewFile"));
 		try {
 			assertFalse(f.exists());
 			f.createNewFile();
@@ -369,8 +402,7 @@ public class FileTest extends AndroidTestCase {
 
 	public void testWriteNewFile() {
 		File root = new File("/");
-		File f = new File("/testWriteNewFile."
-				+ Integer.toString((int) (Math.random() * Integer.MAX_VALUE)));
+		File f = new File(randomFileName("testWriteNewFile"));
 		try {
 			assertTrue(root.isDirectory());
 			assertFalse(f.exists());
@@ -395,8 +427,7 @@ public class FileTest extends AndroidTestCase {
 	public void testWriteByteInNewFileThenRead() {
 		byte testValue = 43;
 		File root = new File("/");
-		File f = new File("/testWriteNewFile."
-				+ Integer.toString((int) (Math.random() * Integer.MAX_VALUE)));
+		File f = new File(randomFileName("testWriteNewFile"));
 		try {
 			assertTrue(root.isDirectory());
 			assertFalse(f.exists());
@@ -420,8 +451,7 @@ public class FileTest extends AndroidTestCase {
 
 	public void testWriteTextInNewFileThenReadByByte() {
 		String testString = "this is a test of IOCipher!";
-		File f = new File("/testWriteTextInNewFileThenReadByByte."
-				+ Integer.toString((int) (Math.random() * Integer.MAX_VALUE)));
+		File f = new File(randomFileName("testWriteTextInNewFileThenReadByByte"));
 		try {
 			assertFalse(f.exists());
 			BufferedWriter out = new BufferedWriter(new FileWriter(f));
@@ -446,8 +476,7 @@ public class FileTest extends AndroidTestCase {
 
 	public void testWriteTextInNewFileThenReadIntoByteArray() {
 		String testString = "this is a test of IOCipher!";
-		File f = new File("/testWriteTextInNewFileThenReadIntoByteArray."
-				+ Integer.toString((int) (Math.random() * Integer.MAX_VALUE)));
+		File f = new File(randomFileName("testWriteTextInNewFileThenReadIntoByteArray"));
 		try {
 			assertFalse(f.exists());
 			BufferedWriter out = new BufferedWriter(new FileWriter(f));
@@ -472,8 +501,7 @@ public class FileTest extends AndroidTestCase {
 
 	public void testWriteTextInNewFileThenReadOneByteByByte() {
 		String testString = "01234567890abcdefgh";
-		File f = new File("/testWriteTextInNewFileThenReadOneByteByByte."
-				+ Integer.toString((int) (Math.random() * Integer.MAX_VALUE)));
+		File f = new File(randomFileName("testWriteTextInNewFileThenReadOneByteByByte."));
 		try {
 			assertFalse(f.exists());
 			BufferedWriter out = new BufferedWriter(new FileWriter(f));
@@ -508,8 +536,7 @@ public class FileTest extends AndroidTestCase {
 
 	public void testWriteTextInNewFileThenCheckSize() {
 		String testString = "01234567890abcdefgh";
-		File f = new File("/testWriteTextInNewFileThenCheckSize."
-				+ Integer.toString((int) (Math.random() * Integer.MAX_VALUE)));
+		File f = new File(randomFileName("testWriteTextInNewFileThenCheckSize"));
 		try {
 			assertFalse(f.exists());
 			BufferedWriter out = new BufferedWriter(new FileWriter(f));
@@ -532,8 +559,7 @@ public class FileTest extends AndroidTestCase {
 
 	public void testWriteTextInNewFileThenSkipAndRead() {
 		String testString = "01234567890abcdefghijklmnopqrstuvxyz";
-		File f = new File("/testWriteTextInNewFileThenSkipAndRead."
-				+ Integer.toString((int) (Math.random() * Integer.MAX_VALUE)));
+		File f = new File(randomFileName("testWriteTextInNewFileThenSkipAndRead"));
 		try {
 			assertFalse(f.exists());
 			BufferedWriter out = new BufferedWriter(new FileWriter(f));
@@ -566,8 +592,7 @@ public class FileTest extends AndroidTestCase {
 	public void testWriteRepeat() {
 		int i, repeat = 1000;
 		String testString = "01234567890abcdefghijklmnopqrstuvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\n";
-		File f = new File("/testWriteRepeat."
-				+ Integer.toString((int) (Math.random() * Integer.MAX_VALUE)));
+		File f = new File(randomFileName("testWriteRepeat"));
 		try {
 			assertFalse(f.exists());
 			BufferedWriter out = new BufferedWriter(new FileWriter(f));
@@ -590,8 +615,7 @@ public class FileTest extends AndroidTestCase {
 	public void testWriteSkipWrite() {
 		int skip = 100;
 		String testString = "testWriteSkipWrite0123456789\n";
-		File f = new File("/testWriteSkipWrite."
-				+ Integer.toString((int) (Math.random() * Integer.MAX_VALUE)));
+		File f = new File(randomFileName("testWriteSkipWrite"));
 		try {
 			assertFalse(f.exists());
 			RandomAccessFile inout = new RandomAccessFile(f, "rw");
@@ -615,8 +639,7 @@ public class FileTest extends AndroidTestCase {
 
 	public void testWriteTextInNewFileThenFileInputStream() {
 		String testString = "01234567890abcdefgh";
-		File f = new File("/testWriteTextInNewFileThenFileInputStream."
-				+ Integer.toString((int) (Math.random() * Integer.MAX_VALUE)));
+		File f = new File(randomFileName("testWriteTextInNewFileThenFileInputStream"));
 		try {
 			assertFalse(f.exists());
 			BufferedWriter out = new BufferedWriter(new FileWriter(f));
@@ -639,8 +662,7 @@ public class FileTest extends AndroidTestCase {
 
 	public void testWriteManyLinesInNewFileThenFileInputStream() {
 		String testString = "01234567890abcdefghijklmnopqrstuvwxyz";
-		File f = new File("/testWriteManyLinesInNewFileThenFileInputStream."
-				+ Integer.toString((int) (Math.random() * Integer.MAX_VALUE)));
+		File f = new File(randomFileName("testWriteManyLinesInNewFileThenFileInputStream"));
 		try {
 			assertFalse(f.exists());
 			BufferedWriter out = new BufferedWriter(new FileWriter(f));
@@ -662,25 +684,6 @@ public class FileTest extends AndroidTestCase {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
 		}
-	}
-
-	private boolean writeRandomBytes(int bytes, String filename) {
-		try {
-			File f = new File(filename);
-			FileOutputStream out = new FileOutputStream(f);
-
-			Random prng = new Random();
-			byte[] random_buf = new byte[bytes];
-			prng.nextBytes(random_buf);
-
-			out.write(random_buf);
-			out.close();
-
-		} catch (IOException e) {
-			Log.e(TAG, e.getCause().toString());
-			assertFalse(true);
-		}
-		return true;
 	}
 
 	private byte[] digest(File f) {
@@ -706,15 +709,6 @@ public class FileTest extends AndroidTestCase {
 		}
 		return null;
 	}
-
-	private static String toHex(byte[] digest) {
-        Formatter formatter = new Formatter();
-        for (byte b : digest) {
-            formatter.format("%02x", b);
-        }
-        return formatter.toString();
-    }
-
 
 	public void testFileChannelTransferTo() {
 		String input_name = "/testCopyFileChannels-input";
@@ -802,8 +796,7 @@ public class FileTest extends AndroidTestCase {
 		byte testValue = 43;
 		byte secondTestValue = 100;
 		File root = new File("/");
-		File f = new File("/testWriteExistingFile."
-				+ Integer.toString((int) (Math.random() * Integer.MAX_VALUE)));
+		File f = new File(randomFileName("testWriteByteInExistingFileThenRead"));
 		try {
 			assertTrue(root.isDirectory());
 			assertFalse(f.exists());
