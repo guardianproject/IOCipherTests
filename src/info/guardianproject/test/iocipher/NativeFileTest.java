@@ -1,18 +1,16 @@
 package info.guardianproject.test.iocipher;
 
-import info.guardianproject.iocipher.File;
-import info.guardianproject.iocipher.FileInputStream;
-import info.guardianproject.iocipher.FileOutputStream;
-import info.guardianproject.iocipher.FileReader;
-import info.guardianproject.iocipher.FileWriter;
-import info.guardianproject.iocipher.IOCipherFileChannel;
-import info.guardianproject.iocipher.RandomAccessFile;
-import info.guardianproject.iocipher.VirtualFileSystem;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.channels.FileChannel;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -20,20 +18,18 @@ import java.util.Arrays;
 import java.util.Formatter;
 import java.util.Random;
 
-import android.content.Context;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
-public class FileTest extends AndroidTestCase {
-	private final static String TAG = "FileTest";
-
-	private VirtualFileSystem vfs;
+public class NativeFileTest extends AndroidTestCase {
+	private final static String TAG = "NativeFileTest";
+	private File ROOT = null;
 
 	// Utility methods
 	private String randomFileName(String testName) {
 		String name = null;
 		do {
-			name = "/" + testName + "." + Integer.toString((int) (Math.random() * Integer.MAX_VALUE));
+			name = ROOT.getAbsolutePath() + "/" + testName + "." + Integer.toString((int) (Math.random() * Integer.MAX_VALUE));
 		} while((new File(name)).exists());
 		return name;
 	}
@@ -68,24 +64,11 @@ public class FileTest extends AndroidTestCase {
 
 	@Override
 	protected void setUp() {
-		java.io.File db = new java.io.File(mContext.getDir("vfs",
-				Context.MODE_PRIVATE).getAbsoluteFile(), TAG + ".db");
-		if (db.exists())
-			db.delete();
-		Log.v(TAG, "database file: " + db.getAbsolutePath());
-		if (db.exists())
-			Log.v(TAG, "exists: " + db.getAbsolutePath());
-		if (!db.canRead())
-			Log.v(TAG, "can't read: " + db.getAbsolutePath());
-		if (!db.canWrite())
-			Log.v(TAG, "can't write: " + db.getAbsolutePath());
-		vfs = new VirtualFileSystem(db.getAbsolutePath());
-		vfs.mount("this is my secure password");
+		ROOT = getContext().getFilesDir();
 	}
 
 	@Override
 	protected void tearDown() {
-		vfs.unmount();
 	}
 
 	public void testExists() {
@@ -98,44 +81,44 @@ public class FileTest extends AndroidTestCase {
 		}
 	}
 
-	public void testGetFreeSpace() {
-		File f = new File("");
-		try {
-			long free = f.getFreeSpace();
-			Log.v(TAG, "f.getFreeSpace: " + Long.toString(free));
-			assertTrue(free > 0);
-		} catch (ExceptionInInitializerError e) {
-			Log.e(TAG, e.getCause().toString());
-			assertFalse(true);
-		}
-	}
+//	public void testGetFreeSpace() {
+//		File f = new File(ROOT, "");
+//		try {
+//			long free = f.getFreeSpace();
+//			Log.v(TAG, "f.getFreeSpace: " + Long.toString(free));
+//			assertTrue(free > 0);
+//		} catch (ExceptionInInitializerError e) {
+//			Log.e(TAG, e.getCause().toString());
+//			assertFalse(true);
+//		}
+//	}
 
-	public void testGetUsableSpace() {
-		File f = new File("");
-		try {
-			long total = f.getUsableSpace();
-			Log.v(TAG, "f.getUsableSpace: " + Long.toString(total));
-			assertTrue(total > 0);
-		} catch (ExceptionInInitializerError e) {
-			Log.e(TAG, e.getCause().toString());
-			assertFalse(true);
-		}
-	}
+//	public void testGetUsableSpace() {
+//		File f = new File(ROOT, "");
+//		try {
+//			long total = f.getUsableSpace();
+//			Log.v(TAG, "f.getUsableSpace: " + Long.toString(total));
+//			assertTrue(total > 0);
+//		} catch (ExceptionInInitializerError e) {
+//			Log.e(TAG, e.getCause().toString());
+//			assertFalse(true);
+//		}
+//	}
 
-	public void testGetTotalSpace() {
-		File f = new File("");
-		try {
-			long total = f.getTotalSpace();
-			Log.v(TAG, "f.getTotalSpace: " + Long.toString(total));
-			assertTrue(total > 0);
-		} catch (ExceptionInInitializerError e) {
-			Log.e(TAG, e.getCause().toString());
-			assertFalse(true);
-		}
-	}
+//	public void testGetTotalSpace() {
+//		File f = new File(ROOT, "");
+//		try {
+//			long total = f.getTotalSpace();
+//			Log.v(TAG, "f.getTotalSpace: " + Long.toString(total));
+//			assertTrue(total > 0);
+//		} catch (ExceptionInInitializerError e) {
+//			Log.e(TAG, e.getCause().toString());
+//			assertFalse(true);
+//		}
+//	}
 
 	public void testMkdirExists() {
-		File f = new File("/test.iocipher.dir."
+		File f = new File(ROOT, "test.iocipher.dir."
 				+ Integer.toString((int) (Math.random() * 1024)));
 		try {
 			assertFalse(f.exists());
@@ -148,8 +131,7 @@ public class FileTest extends AndroidTestCase {
 	}
 
 	public void testMkdirs() {
-		File f0 = new File("/"
-				+ Integer.toString((int) (Math.random() * Integer.MAX_VALUE)));
+		File f0 = new File(ROOT, Integer.toString((int) (Math.random() * Integer.MAX_VALUE)));
 		File f1 = new File(f0,
 				Integer.toString((int) (Math.random() * Integer.MAX_VALUE)));
 		File f2 = new File(f1,
@@ -173,7 +155,7 @@ public class FileTest extends AndroidTestCase {
 	}
 
 	public void testSlashIsDirectory() {
-		File f = new File("/");
+		File f = ROOT;
 		try {
 			assertTrue(f.isDirectory());
 		} catch (ExceptionInInitializerError e) {
@@ -183,7 +165,7 @@ public class FileTest extends AndroidTestCase {
 	}
 
 	public void testCanReadSlash() {
-		File f = new File("/");
+		File f = ROOT;
 		try {
 			assertTrue(f.isDirectory());
 			assertTrue(f.canRead());
@@ -194,7 +176,7 @@ public class FileTest extends AndroidTestCase {
 	}
 
 	public void testCanWriteSlash() {
-		File f = new File("/");
+		File f = ROOT;
 		try {
 			assertTrue(f.isDirectory());
 			assertTrue(f.canWrite());
@@ -205,7 +187,7 @@ public class FileTest extends AndroidTestCase {
 	}
 
 	public void testSlashIsFile() {
-		File f = new File("/");
+		File f = ROOT;
 		try {
 			assertFalse(f.isFile());
 		} catch (ExceptionInInitializerError e) {
@@ -215,7 +197,7 @@ public class FileTest extends AndroidTestCase {
 	}
 
 	public void testSlashIsAbsolute() {
-		File f = new File("/");
+		File f = ROOT;
 		try {
 			assertTrue(f.isAbsolute());
 		} catch (ExceptionInInitializerError e) {
@@ -225,7 +207,7 @@ public class FileTest extends AndroidTestCase {
 	}
 
 	public void testMkdirRemove() {
-		File f = new File("/mkdir-to-remove");
+		File f = new File(ROOT, "mkdir-to-remove");
 		try {
 			assertTrue(f.mkdir());
 			assertTrue(f.exists());
@@ -238,10 +220,10 @@ public class FileTest extends AndroidTestCase {
 	}
 
 	public void testARenameDirFailure() {
-		File d = new File("/dir-to-rename");
+		File d = new File(ROOT, "dir-to-rename");
 		try {
 			d.mkdir();
-			assertFalse(d.renameTo(new File("/somethingelse")));
+			assertFalse(d.renameTo(new File(ROOT, "somethingelse")));
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
@@ -256,7 +238,7 @@ public class FileTest extends AndroidTestCase {
 		String dir = "/mkdir-to-rename";
 		String newdir = "/renamed";
 		String firstfile = "first-file";
-		File root = new File("/");
+		File root = ROOT;
 		File d = new File(dir);
 		File newd = new File(newdir);
 		try {
@@ -293,7 +275,7 @@ public class FileTest extends AndroidTestCase {
 	}
 
 	public void testNewFileRename() {
-		File root = new File("/");
+		File root = ROOT;
 		File f = new File(randomFileName("testNewFileRename-NEW"));
 		File newf = new File(randomFileName("testNewFileRename-RENAMED"));
 		try {
@@ -315,7 +297,7 @@ public class FileTest extends AndroidTestCase {
 	}
 
 	public void testMkdirIsDirectory() {
-		File f = new File("/mkdir-to-test");
+		File f = new File(ROOT, "mkdir-to-test");
 		try {
 			f.mkdir();
 			assertTrue(f.isDirectory());
@@ -326,8 +308,8 @@ public class FileTest extends AndroidTestCase {
 	}
 
 	public void testMkdirList() {
-		File root = new File("/");
-		File f = new File("/mkdir-to-list");
+		File root = ROOT;
+		File f = new File(ROOT, "mkdir-to-list");
 		try {
 			f.mkdir();
 			final String[] files = root.list();
@@ -345,7 +327,7 @@ public class FileTest extends AndroidTestCase {
 /*
 // TODO testMkdirLastModified fails
 	public void testMkdirLastModified() {
-		File root = new File("/");
+		File root = ROOT;
 		File f = new File(randomFileName("test.iocipher.dir"));
 		try {
 			long lasttime = root.lastModified();
@@ -380,7 +362,7 @@ public class FileTest extends AndroidTestCase {
 */
 
 	public void testCreateNewFile() {
-		File root = new File("/");
+		File root = ROOT;
 		File f = new File(randomFileName("testCreateNewFile"));
 		try {
 			assertFalse(f.exists());
@@ -401,7 +383,7 @@ public class FileTest extends AndroidTestCase {
 	}
 
 	public void testWriteNewFile() {
-		File root = new File("/");
+		File root = ROOT;
 		File f = new File(randomFileName("testWriteNewFile"));
 		try {
 			assertTrue(root.isDirectory());
@@ -426,7 +408,7 @@ public class FileTest extends AndroidTestCase {
 
 	public void testWriteByteInNewFileThenRead() {
 		byte testValue = 43;
-		File root = new File("/");
+		File root = ROOT;
 		File f = new File(randomFileName("testWriteNewFile"));
 		try {
 			assertTrue(root.isDirectory());
@@ -545,7 +527,7 @@ public class FileTest extends AndroidTestCase {
 			assertTrue(f.exists());
 			assertTrue(f.isFile());
 			FileInputStream in = new FileInputStream(f);
-			IOCipherFileChannel channel = in.getChannel();
+			FileChannel channel = in.getChannel();
 			assertTrue(channel.size() == testString.length());
 			assertTrue(testString.length() == f.length());
 		} catch (ExceptionInInitializerError e) {
@@ -725,8 +707,8 @@ public class FileTest extends AndroidTestCase {
 
 			FileInputStream source = new FileInputStream(inputFile);
 			FileOutputStream destination = new FileOutputStream(output_name);
-	        IOCipherFileChannel sourceFileChannel = source.getChannel();
-	        IOCipherFileChannel destinationFileChannel = destination.getChannel();
+	        FileChannel sourceFileChannel = source.getChannel();
+	        FileChannel destinationFileChannel = destination.getChannel();
 
 	        sourceFileChannel.transferTo(0, sourceFileChannel.size(), destinationFileChannel);
 	        sourceFileChannel.close();
@@ -766,8 +748,8 @@ public class FileTest extends AndroidTestCase {
 
 			FileInputStream source = new FileInputStream(inputFile);
 			FileOutputStream destination = new FileOutputStream(output_name);
-	        IOCipherFileChannel sourceFileChannel = source.getChannel();
-	        IOCipherFileChannel destinationFileChannel = destination.getChannel();
+	        FileChannel sourceFileChannel = source.getChannel();
+	        FileChannel destinationFileChannel = destination.getChannel();
 
 	        destinationFileChannel.transferFrom(sourceFileChannel, 0, sourceFileChannel.size());
 	        sourceFileChannel.close();
@@ -795,7 +777,7 @@ public class FileTest extends AndroidTestCase {
 	public void testWriteByteInExistingFileThenRead() {
 		byte testValue = 43;
 		byte secondTestValue = 100;
-		File root = new File("/");
+		File root = ROOT;
 		File f = new File(randomFileName("testWriteByteInExistingFileThenRead"));
 		try {
 			assertTrue(root.isDirectory());
@@ -831,10 +813,10 @@ public class FileTest extends AndroidTestCase {
 	}
 
 	public void testEqualsAndCompareTo() {
-		String filename = "/thisisafile";
-		File f = new File(filename);
-		File dup = new File(filename);
-		File diff = new File("/differentfile");
+		String filename = "thisisafile";
+		File f = new File(ROOT, filename);
+		File dup = new File(ROOT,filename);
+		File diff = new File(ROOT, "differentfile");
 		assertTrue(f.equals(dup));
 		assertTrue(f.compareTo(dup) == 0);
 		assertFalse(f.equals(diff));
