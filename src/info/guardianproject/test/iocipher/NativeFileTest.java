@@ -776,6 +776,32 @@ public class NativeFileTest extends AndroidTestCase {
 	}
 
 	@SmallTest
+	public void testFileExistingAppend() {
+		String name = randomFileName("testFileExistingAppend");
+		writeRandomBytes(500, name);
+
+		File f = new File(name);
+		assertEquals(500, f.length());
+
+		try {
+			FileOutputStream out = new FileOutputStream(f, true);
+
+			//write 2 bytes
+			out.write(1);
+			out.write(2);
+			out.close();
+
+			assertEquals(502, f.length());
+		} catch (FileNotFoundException e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		} catch (IOException e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		}
+	}
+
+	@SmallTest
 	public void testFileExistingTruncate() {
 		String name = randomFileName("testFileExistingTruncate");
 		writeRandomBytes(500, name);
