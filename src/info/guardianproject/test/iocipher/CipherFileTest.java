@@ -67,7 +67,6 @@ public class CipherFileTest extends AndroidTestCase {
 		return true;
 	}
 
-
 	@Override
 	protected void setUp() {
 		java.io.File db = new java.io.File(mContext.getDir("vfs",
@@ -336,8 +335,8 @@ public class CipherFileTest extends AndroidTestCase {
 			for (String filename : files) {
 				Log.v(TAG, "testMkdirList file: " + filename);
 			}
-			assertTrue(files.length > 2); // it should always give us "." and
-			// ".."
+			Log.v(TAG, "testMkdirList list: " + files.length);
+			assertTrue(files.length == 1); // ".." and "." shouldn't be included
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
