@@ -602,13 +602,13 @@ public class NativeFileTest extends AndroidTestCase {
 			assertFalse(f.exists());
 			RandomAccessFile inout = new RandomAccessFile(f, "rw");
 			inout.writeBytes(testString);
-			inout.seek(skip);
+			inout.seek(inout.getFilePointer() + skip);
 			inout.writeBytes(testString);
 			inout.close();
 			assertTrue(f.exists());
 			assertTrue(f.isFile());
 			int inputLength = (testString.length() * 2) + skip;
-			Log.v(TAG, f.toString() + ".length(): " + f.length() + " " + inputLength);
+			Log.v(TAG, "testWriteSkipWrite: " + f.toString() + ".length(): " + f.length() + " " + inputLength);
 			assertTrue(f.length() == inputLength);
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
