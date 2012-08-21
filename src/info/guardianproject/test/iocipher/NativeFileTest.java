@@ -62,14 +62,28 @@ public class NativeFileTest extends AndroidTestCase {
 		return true;
 	}
 
+	private void deleteDirectory(File dir) {
+		for(File child : dir.listFiles() ) {
+			if( child.isDirectory() ) {
+				deleteDirectory(child);
+				child.delete();
+			}
+			else
+				child.delete();
+		}
+		dir.delete();
+	}
 
 	@Override
 	protected void setUp() {
-		ROOT = getContext().getFilesDir();
+		File filesDir = getContext().getFilesDir(); 
+		ROOT = new File(filesDir, "testing-data");
+		ROOT.mkdir();
 	}
 
 	@Override
 	protected void tearDown() {
+		deleteDirectory(ROOT);
 	}
 
 	public void testExists() {
@@ -220,28 +234,13 @@ public class NativeFileTest extends AndroidTestCase {
 		}
 	}
 
-	public void testARenameDirFailure() {
-		File d = new File(ROOT, "dir-to-rename");
-		try {
-			d.mkdir();
-			assertFalse(d.renameTo(new File(ROOT, "somethingelse")));
-		} catch (ExceptionInInitializerError e) {
-			Log.e(TAG, e.getCause().toString());
-			assertFalse(true);
-		}
-	}
-
-
 	public void testMkdirRename() {
-		// TODO libsqlfs does not support renaming directories
-		fail("TODO libsqlfs does not support renaming directories");
-		/*
-		String dir = "/mkdir-to-rename";
-		String newdir = "/renamed";
+		String dir = "mkdir-to-rename";
+		String newdir = "renamed";
 		String firstfile = "first-file";
 		File root = ROOT;
-		File d = new File(dir);
-		File newd = new File(newdir);
+		File d = new File(root, dir);
+		File newd = new File(root, newdir);
 		try {
 			d.mkdir();
 			File f1 = new File(d, firstfile);
@@ -272,7 +271,7 @@ public class NativeFileTest extends AndroidTestCase {
 		} catch (IOException e) {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
-		}*/
+		}
 	}
 
 	public void testNewFileRename() {
@@ -694,8 +693,8 @@ public class NativeFileTest extends AndroidTestCase {
 	}
 
 	public void testFileChannelTransferTo() {
-		String input_name = "/testCopyFileChannels-input";
-		String output_name = "/testCopyFileChannels-output";
+		String input_name = ROOT.getAbsolutePath() + "/testCopyFileChannelsTo-input";
+		String output_name = ROOT.getAbsolutePath() + "/testCopyFileChannelsTo-output";
 		writeRandomBytes(1000, input_name);
 		File inputFile = new File(input_name);
 		File outputFile = new File(output_name);
@@ -703,8 +702,6 @@ public class NativeFileTest extends AndroidTestCase {
 		try {
 			assertTrue(inputFile.exists());
 			assertTrue(inputFile.isFile());
-
-			assertFalse(outputFile.exists());
 
 			FileInputStream source = new FileInputStream(inputFile);
 			FileOutputStream destination = new FileOutputStream(output_name);
@@ -735,8 +732,8 @@ public class NativeFileTest extends AndroidTestCase {
 	}
 
 	public void testFileChannelTransferFrom() {
-		String input_name = "/testCopyFileChannels-input";
-		String output_name = "/testCopyFileChannels-output";
+		String input_name = ROOT.getAbsolutePath() + "/testCopyFileChannelsFrom-input";
+		String output_name = ROOT.getAbsolutePath() + "/testCopyFileChannelsFrom-output";
 		writeRandomBytes(1000, input_name);
 		File inputFile = new File(input_name);
 		File outputFile = new File(output_name);
@@ -744,8 +741,6 @@ public class NativeFileTest extends AndroidTestCase {
 		try {
 			assertTrue(inputFile.exists());
 			assertTrue(inputFile.isFile());
-
-			assertFalse(outputFile.exists());
 
 			FileInputStream source = new FileInputStream(inputFile);
 			FileOutputStream destination = new FileOutputStream(output_name);
