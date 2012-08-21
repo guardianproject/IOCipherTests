@@ -267,7 +267,7 @@ public class CipherFileTest extends AndroidTestCase {
 			assertTrue(f1.exists());
 			String[] files = d.list();
 			for (String filename : files) {
-				Log.v(TAG, "testMkdirList " + dir + ": " + filename);
+				Log.v(TAG, "testMkdirRename " + dir + ": " + filename);
 			}
 			assertTrue(d.renameTo(newd));
 			assertTrue(new File(newd, firstfile).exists());
@@ -275,11 +275,11 @@ public class CipherFileTest extends AndroidTestCase {
 			f2.createNewFile();
 			files = root.list();
 			for (String filename : files) {
-				Log.v(TAG, "testMkdirList root: " + filename);
+				Log.v(TAG, "testMkdirRename root: " + filename);
 			}
 			files = newd.list();
 			for (String filename : files) {
-				Log.v(TAG, "testMkdirList " + newdir + ": " + filename);
+				Log.v(TAG, "testMkdirRename " + newdir + ": " + filename);
 			}
 			assertFalse(d.exists());
 			assertTrue(newd.exists());
