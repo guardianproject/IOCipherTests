@@ -247,6 +247,7 @@ public class NativeFileTest extends AndroidTestCase {
 			f1.createNewFile();
 			assertTrue(f1.exists());
 			String[] files = d.list();
+			assertEquals(files.length, 1);
 			for (String filename : files) {
 				Log.v(TAG, "testMkdirRename " + dir + ": " + filename);
 			}
@@ -255,10 +256,12 @@ public class NativeFileTest extends AndroidTestCase {
 			File f2 = new File(newd, "second-file");
 			f2.createNewFile();
 			files = root.list();
+			assertEquals(files.length, 1);
 			for (String filename : files) {
 				Log.v(TAG, "testMkdirRename root: " + filename);
 			}
 			files = newd.list();
+			assertEquals(files.length, 2);
 			for (String filename : files) {
 				Log.v(TAG, "testMkdirRename " + newdir + ": " + filename);
 			}
@@ -596,20 +599,31 @@ public class NativeFileTest extends AndroidTestCase {
 
 	public void testWriteSkipWrite() {
 		int skip = 100;
-		String testString = "testWriteSkipWrite0123456789\n";
+		String testString = "the best of times\n";
+		String testString2 = "the worst of times\n";
 		File f = new File(randomFileName("testWriteSkipWrite"));
 		try {
 			assertFalse(f.exists());
 			RandomAccessFile inout = new RandomAccessFile(f, "rw");
 			inout.writeBytes(testString);
 			inout.seek(inout.getFilePointer() + skip);
-			inout.writeBytes(testString);
+			inout.writeBytes(testString2);
 			inout.close();
 			assertTrue(f.exists());
 			assertTrue(f.isFile());
-			int inputLength = (testString.length() * 2) + skip;
+			int inputLength = testString.length() + skip + testString2.length();
 			Log.v(TAG, "testWriteSkipWrite: " + f.toString() + ".length(): " + f.length() + " " + inputLength);
 			assertTrue(f.length() == inputLength);
+			
+			inout = new RandomAccessFile(f, "rw");
+			byte[] best = new byte[testString.length()];
+			byte[] worst = new byte[testString2.length()];
+			inout.read(best, 0, testString.length());
+			inout.seek(inout.getFilePointer() + skip);
+			inout.read(worst, 0, testString2.length());
+			inout.close();
+			assertEquals(new String(best), testString);
+			assertEquals(new String(worst), testString2);
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);

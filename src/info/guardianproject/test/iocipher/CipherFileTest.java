@@ -249,23 +249,20 @@ public class CipherFileTest extends AndroidTestCase {
 		}
 	}
 
-
-	public void testMkdirRename() {
-		// TODO libsqlfs does not support renaming directories
-		fail("TODO libsqlfs does not support renaming directories");
-		/*
-		String dir = "/mkdir-to-rename";
-		String newdir = "/renamed";
+	public void testMkdirRename() {		
+		String dir = "mkdir-to-rename";
+		String newdir = "renamed";
 		String firstfile = "first-file";
 		File root = ROOT;
-		File d = new File(dir);
-		File newd = new File(newdir);
+		File d = new File(root, dir);
+		File newd = new File(root, newdir);
 		try {
 			d.mkdir();
 			File f1 = new File(d, firstfile);
 			f1.createNewFile();
 			assertTrue(f1.exists());
 			String[] files = d.list();
+			assertEquals(files.length, 1);
 			for (String filename : files) {
 				Log.v(TAG, "testMkdirRename " + dir + ": " + filename);
 			}
@@ -274,10 +271,12 @@ public class CipherFileTest extends AndroidTestCase {
 			File f2 = new File(newd, "second-file");
 			f2.createNewFile();
 			files = root.list();
+			assertEquals(files.length, 1);
 			for (String filename : files) {
 				Log.v(TAG, "testMkdirRename root: " + filename);
 			}
 			files = newd.list();
+			assertEquals(files.length, 2);
 			for (String filename : files) {
 				Log.v(TAG, "testMkdirRename " + newdir + ": " + filename);
 			}
@@ -290,7 +289,7 @@ public class CipherFileTest extends AndroidTestCase {
 		} catch (IOException e) {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
-		}*/
+		}
 	}
 
 	public void testNewFileRename() {
