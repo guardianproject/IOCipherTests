@@ -238,18 +238,21 @@ public class CipherFileTest extends AndroidTestCase {
 		}
 	}
 
-	public void testARenameDirFailure() {
+	public void testRenameToExisting() {
 		File d = new File(ROOT, "dir-to-rename");
+		File d2 = new File(ROOT, "exists");
 		try {
 			d.mkdir();
-			assertFalse(d.renameTo(new File(ROOT, "somethingelse")));
+			d2.mkdir();
+			assertFalse(d.renameTo(new File(ROOT, "exists")));
+			assertTrue(d.exists());
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
 		}
 	}
 
-	public void testMkdirRename() {		
+	public void testMkdirRename() {
 		String dir = "mkdir-to-rename";
 		String newdir = "renamed";
 		String firstfile = "first-file";
@@ -629,7 +632,7 @@ public class CipherFileTest extends AndroidTestCase {
 			int inputLength = testString.length() + skip + testString2.length();
 			Log.v(TAG, "testWriteSkipWrite: " + f.toString() + ".length(): " + f.length() + " " + inputLength);
 			assertTrue(f.length() == inputLength);
-			
+
 			inout = new RandomAccessFile(f, "rw");
 			byte[] best = new byte[testString.length()];
 			byte[] worst = new byte[testString2.length()];
