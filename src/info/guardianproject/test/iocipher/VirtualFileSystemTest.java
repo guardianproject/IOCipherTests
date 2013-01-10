@@ -71,9 +71,11 @@ public class VirtualFileSystemTest extends AndroidTestCase {
 		try {
 			vfs.mount("this is the WRONG password");
 		} catch (Exception e) {
-			assertTrue(true);
+			e.printStackTrace();
+			return;
 		} finally {
 			vfs.unmount();
 		}
+		fail();
 	}
 }
