@@ -23,6 +23,47 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="100dp"
-        android:text="click me" />
+        android:paddingBottom="20dp"
+        android:text="write image" />
+
+    <ToggleButton
+        android:id="@+id/toggleStrobe"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/runButton"
+        android:layout_alignRight="@+id/runButton"
+        android:layout_alignTop="@+id/runButton"
+        android:layout_marginTop="100dp"
+        android:text="toggle strobe" />
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/runButton"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="21dp"
+        android:text="Successes  /  Attempts"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/successCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/runButton"
+        android:layout_alignLeft="@+id/textView1"
+		android:layout_marginLeft="40dp"
+        android:text="0"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <TextView
+        android:id="@+id/attemptCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/runButton"
+        android:layout_alignRight="@+id/textView1"
+        android:layout_marginRight="40dp"
+        android:text="0"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
 </RelativeLayout>

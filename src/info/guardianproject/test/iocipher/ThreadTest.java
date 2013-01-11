@@ -1,4 +1,5 @@
 /**
+ * Copyright 2013 Abel Luck <abel@guardianproject.info>
  * Copyright 2012 Aaron Huttner <aaron@gryphn.co>
  */
 package info.guardianproject.test.iocipher;
@@ -14,9 +15,6 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 
 import info.guardianproject.test.iocipher.R;
-import info.guardianproject.test.iocipher.R.id;
-import info.guardianproject.test.iocipher.R.layout;
-import info.guardianproject.test.iocipher.R.raw;
 
 import android.app.Activity;
 import android.content.Context;
@@ -29,7 +27,11 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.ToggleButton;
 
 public class ThreadTest extends Activity {
 	private VirtualFileSystem vfs;
@@ -37,11 +39,16 @@ public class ThreadTest extends Activity {
 
 	private Button mRunButton;
 	private ImageView mImageView;
+	private ToggleButton mToggleStrobe;
+	private TextView mSuccessCounter;
+	private int mSuccessCount = 0;
+	private TextView mAttemptCounter;
+	private int mAttemptCount = 0;
 
 	private Handler handler;
 	private int IMG_NUM = 1;
 
-	private static final int DELAY = 100; // delay in milliseconds for the
+	private static int DELAY = 100; // delay in milliseconds for the
 											// runnable below, the shorter the
 											// delay the easier it is to cause
 											// the problem
@@ -55,6 +62,13 @@ public class ThreadTest extends Activity {
 		mImageView = (ImageView) findViewById(R.id.imageView);
 
 		mRunButton = (Button) findViewById(R.id.runButton);
+
+		mToggleStrobe = (ToggleButton) findViewById(R.id.toggleStrobe);
+
+		mSuccessCounter = (TextView) findViewById(R.id.successCount);
+		mSuccessCounter.setText("0");
+		mAttemptCounter = (TextView) findViewById(R.id.attemptCount);
+		mAttemptCounter.setText("0");
 
 		/*
 		 * set up a button to try to save new info the the IOCipher DB while
@@ -73,6 +87,7 @@ public class ThreadTest extends Activity {
 
 			}
 		});
+
 
 		// mount the db and add some files to it
 		mount();
@@ -107,16 +122,32 @@ public class ThreadTest extends Activity {
 					input = new info.guardianproject.iocipher.FileInputStream(image);
 					Bitmap bm = BitmapFactory.decodeStream(input, null, null);
 					mImageView.setImageBitmap(bm);
+					DELAY = 100;
 				} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+					DELAY = 5000;
 				}
 
 				handler.postDelayed(this, DELAY);
 			}
 		};
 
-		handler.postDelayed(switchR, DELAY);
+
+		mToggleStrobe.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView,
+					boolean isChecked) {
+				if( !isChecked ) {
+					handler.removeCallbacks(switchR);
+				} else {
+					handler.postDelayed(switchR, DELAY);
+				}
+			}
+
+		});
+		mToggleStrobe.setChecked(true);
 
 	}
 
@@ -144,7 +175,7 @@ public class ThreadTest extends Activity {
 
 	}
 
-	private void copyToCipherDb(String fileName, InputStream is) {
+	private boolean copyToCipherDb(String fileName, InputStream is) {
 		try {
 
 			info.guardianproject.iocipher.FileOutputStream fos = new info.guardianproject.iocipher.FileOutputStream(fileName);
@@ -155,18 +186,37 @@ public class ThreadTest extends Activity {
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
+			Log.v(TAG, "copyToCipherDb:	 IOException");
 			e.printStackTrace();
+			return false;
 		}
+		return true;
 	}
 
-	private class saveFileAsyncTask extends AsyncTask<Void, Void, Void> {
+	private void incrementWriteCount() {
+		mSuccessCounter.setText( Integer.toString( ++mSuccessCount ));
+	}
+	private void incrementAttemptCount() {
+		mAttemptCounter.setText( Integer.toString( ++mAttemptCount ));
+	}
+
+	private class saveFileAsyncTask extends AsyncTask<Void, Void, Boolean> {
 
 		@Override
-		protected Void doInBackground(Void... params) {
-			copyToCipherDb("/thumbs_up.jpeg", getResources().openRawResource(R.raw.thumbs_up));
-			return null;
+		protected void onPreExecute() {
+			incrementAttemptCount();
+		};
+		@Override
+		protected Boolean doInBackground(Void... params) {
+			Log.v(TAG, "saveFileAsyncTask: writing image");
+			return copyToCipherDb("/thumbs_up.jpeg", getResources().openRawResource(R.raw.thumbs_up));
 		}
 
-	}
+		@Override
+		protected void onPostExecute(Boolean result) {
+			if( result )
+				incrementWriteCount();
+	     }
 
+	}
 }
