@@ -38,6 +38,7 @@ public class ThreadTest extends Activity {
 	private static final String TAG = "ThreadTest";
 
 	private Button mRunButton;
+	private Button mResetButton;
 	private ImageView mImageView;
 	private ToggleButton mToggleStrobe;
 	private TextView mSuccessCounter;
@@ -53,6 +54,8 @@ public class ThreadTest extends Activity {
 											// delay the easier it is to cause
 											// the problem
 
+	private Runnable switchR;
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -60,15 +63,11 @@ public class ThreadTest extends Activity {
 		setContentView(R.layout.main);
 
 		mImageView = (ImageView) findViewById(R.id.imageView);
-
 		mRunButton = (Button) findViewById(R.id.runButton);
-
+		mResetButton = (Button) findViewById(R.id.resetButton);
 		mToggleStrobe = (ToggleButton) findViewById(R.id.toggleStrobe);
-
 		mSuccessCounter = (TextView) findViewById(R.id.successCount);
-		mSuccessCounter.setText("0");
 		mAttemptCounter = (TextView) findViewById(R.id.attemptCount);
-		mAttemptCounter.setText("0");
 
 		/*
 		 * set up a button to try to save new info the the IOCipher DB while
@@ -88,11 +87,13 @@ public class ThreadTest extends Activity {
 			}
 		});
 
+		mResetButton.setOnClickListener(new OnClickListener() {
 
-		// mount the db and add some files to it
-		mount();
-		copyToCipherDb("/redbull.jpeg", getResources().openRawResource(R.raw.redbull));
-		copyToCipherDb("/car.jpeg", getResources().openRawResource(R.raw.car));
+			@Override
+			public void onClick(View arg0) {
+				reset();
+			}
+		});
 
 		/*
 		 * set up a runnable to constantly access the IOCipher DB. The point of
@@ -101,7 +102,7 @@ public class ThreadTest extends Activity {
 		 * thread
 		 */
 		handler = new Handler();
-		final Runnable switchR = new Runnable() {
+		switchR = new Runnable() {
 			public void run() {
 
 				String image = "";
@@ -126,7 +127,8 @@ public class ThreadTest extends Activity {
 				} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-					DELAY = 5000;
+					Log.v(TAG, "Strober: opening image failed, delaying...");
+//					DELAY = 5000;
 				}
 
 				handler.postDelayed(this, DELAY);
@@ -147,8 +149,22 @@ public class ThreadTest extends Activity {
 			}
 
 		});
-		mToggleStrobe.setChecked(true);
+		reset();
 
+	}
+
+	public void reset() {
+		DELAY = 100;
+		mount();
+		copyToCipherDb("/redbull.jpeg", getResources().openRawResource(R.raw.redbull));
+		copyToCipherDb("/car.jpeg", getResources().openRawResource(R.raw.car));
+		handler.removeCallbacks(switchR);
+		mSuccessCounter.setText("0");
+		mAttemptCounter.setText("0");
+		mSuccessCount = 0;
+		mAttemptCount = 0;
+		mToggleStrobe.setChecked(true);
+		handler.postDelayed(switchR, DELAY);
 	}
 
 	public void mount() {
@@ -171,8 +187,6 @@ public class ThreadTest extends Activity {
 
 		vfs = new VirtualFileSystem(db.getAbsolutePath());
 		vfs.mount("password");
-
-
 	}
 
 	private boolean copyToCipherDb(String fileName, InputStream is) {

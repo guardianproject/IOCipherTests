@@ -33,8 +33,18 @@
         android:layout_alignLeft="@+id/runButton"
         android:layout_alignRight="@+id/runButton"
         android:layout_alignTop="@+id/runButton"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="50dp"
         android:text="toggle strobe" />
+    
+        <Button
+        android:id="@+id/resetButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/runButton"
+        android:layout_alignRight="@+id/runButton"
+        android:layout_alignTop="@+id/toggleStrobe"
+        android:layout_marginTop="50dp"
+        android:text="reset" />
 
     <TextView
         android:id="@+id/textView1"
