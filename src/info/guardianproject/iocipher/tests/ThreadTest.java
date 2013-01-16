@@ -2,7 +2,7 @@
  * Copyright 2013 Abel Luck <abel@guardianproject.info>
  * Copyright 2012 Aaron Huttner <aaron@gryphn.co>
  */
-package info.guardianproject.test.iocipher;
+package info.guardianproject.iocipher.tests;
 
 import info.guardianproject.iocipher.File;
 import info.guardianproject.iocipher.IOCipherFileChannel;

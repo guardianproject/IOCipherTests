@@ -1,4 +1,4 @@
-package info.guardianproject.test.iocipher;
+package info.guardianproject.iocipher.tests;
 
 import info.guardianproject.iocipher.File;
 import info.guardianproject.iocipher.VirtualFileSystem;

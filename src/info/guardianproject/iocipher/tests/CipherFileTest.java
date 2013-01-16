@@ -1,16 +1,18 @@
-package info.guardianproject.test.iocipher;
+package info.guardianproject.iocipher.tests;
+
+import info.guardianproject.iocipher.File;
+import info.guardianproject.iocipher.FileInputStream;
+import info.guardianproject.iocipher.FileOutputStream;
+import info.guardianproject.iocipher.FileReader;
+import info.guardianproject.iocipher.FileWriter;
+import info.guardianproject.iocipher.IOCipherFileChannel;
+import info.guardianproject.iocipher.RandomAccessFile;
+import info.guardianproject.iocipher.VirtualFileSystem;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.channels.FileChannel;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -18,19 +20,22 @@ import java.util.Arrays;
 import java.util.Formatter;
 import java.util.Random;
 
+import android.content.Context;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
 import android.util.Log;
 
-public class NativeFileTest extends AndroidTestCase {
-	private final static String TAG = "NativeFileTest";
+public class CipherFileTest extends AndroidTestCase {
+	private final static String TAG = "FileTest";
+
+	private VirtualFileSystem vfs;
 	private File ROOT = null;
 
 	// Utility methods
 	private String randomFileName(String testName) {
 		String name = null;
 		do {
-			name = ROOT.getAbsolutePath() + "/" + testName + "." + Integer.toString((int) (Math.random() * Integer.MAX_VALUE));
+			name = "/" + testName + "." + Integer.toString((int) (Math.random() * Integer.MAX_VALUE));
 		} while((new File(name)).exists());
 		return name;
 	}
@@ -62,28 +67,27 @@ public class NativeFileTest extends AndroidTestCase {
 		return true;
 	}
 
-	private void deleteDirectory(File dir) {
-		for(File child : dir.listFiles() ) {
-			if( child.isDirectory() ) {
-				deleteDirectory(child);
-				child.delete();
-			}
-			else
-				child.delete();
-		}
-		dir.delete();
-	}
-
 	@Override
 	protected void setUp() {
-		File filesDir = getContext().getFilesDir(); 
-		ROOT = new File(filesDir, "testing-data");
-		ROOT.mkdir();
+		java.io.File db = new java.io.File(mContext.getDir("vfs",
+				Context.MODE_PRIVATE).getAbsoluteFile(), TAG + ".db");
+		if (db.exists())
+			db.delete();
+		Log.v(TAG, "database file: " + db.getAbsolutePath());
+		if (db.exists())
+			Log.v(TAG, "exists: " + db.getAbsolutePath());
+		if (!db.canRead())
+			Log.v(TAG, "can't read: " + db.getAbsolutePath());
+		if (!db.canWrite())
+			Log.v(TAG, "can't write: " + db.getAbsolutePath());
+		vfs = new VirtualFileSystem(db.getAbsolutePath());
+		vfs.mount("this is my secure password");
+		ROOT = new File("/");
 	}
 
 	@Override
 	protected void tearDown() {
-		deleteDirectory(ROOT);
+		vfs.unmount();
 	}
 
 	public void testExists() {
@@ -228,6 +232,20 @@ public class NativeFileTest extends AndroidTestCase {
 			assertTrue(f.exists());
 			assertTrue(f.delete());
 			assertFalse(f.exists());
+		} catch (ExceptionInInitializerError e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		}
+	}
+
+	public void testRenameToExisting() {
+		File d = new File(ROOT, "dir-to-rename");
+		File d2 = new File(ROOT, "exists");
+		try {
+			d.mkdir();
+			d2.mkdir();
+			assertFalse(d.renameTo(new File(ROOT, "exists")));
+			assertTrue(d.exists());
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
@@ -530,7 +548,7 @@ public class NativeFileTest extends AndroidTestCase {
 			assertTrue(f.exists());
 			assertTrue(f.isFile());
 			FileInputStream in = new FileInputStream(f);
-			FileChannel channel = in.getChannel();
+			IOCipherFileChannel channel = in.getChannel();
 			assertTrue(channel.size() == testString.length());
 			assertTrue(testString.length() == f.length());
 		} catch (ExceptionInInitializerError e) {
@@ -614,7 +632,7 @@ public class NativeFileTest extends AndroidTestCase {
 			int inputLength = testString.length() + skip + testString2.length();
 			Log.v(TAG, "testWriteSkipWrite: " + f.toString() + ".length(): " + f.length() + " " + inputLength);
 			assertTrue(f.length() == inputLength);
-			
+
 			inout = new RandomAccessFile(f, "rw");
 			byte[] best = new byte[testString.length()];
 			byte[] worst = new byte[testString2.length()];
@@ -707,8 +725,8 @@ public class NativeFileTest extends AndroidTestCase {
 	}
 
 	public void testFileChannelTransferTo() {
-		String input_name = ROOT.getAbsolutePath() + "/testCopyFileChannelsTo-input";
-		String output_name = ROOT.getAbsolutePath() + "/testCopyFileChannelsTo-output";
+		String input_name = "/testCopyFileChannels-input";
+		String output_name = "/testCopyFileChannels-output";
 		writeRandomBytes(1000, input_name);
 		File inputFile = new File(input_name);
 		File outputFile = new File(output_name);
@@ -717,10 +735,12 @@ public class NativeFileTest extends AndroidTestCase {
 			assertTrue(inputFile.exists());
 			assertTrue(inputFile.isFile());
 
+			assertFalse(outputFile.exists());
+
 			FileInputStream source = new FileInputStream(inputFile);
 			FileOutputStream destination = new FileOutputStream(output_name);
-	        FileChannel sourceFileChannel = source.getChannel();
-	        FileChannel destinationFileChannel = destination.getChannel();
+			IOCipherFileChannel sourceFileChannel = source.getChannel();
+			IOCipherFileChannel destinationFileChannel = destination.getChannel();
 
 	        sourceFileChannel.transferTo(0, sourceFileChannel.size(), destinationFileChannel);
 	        sourceFileChannel.close();
@@ -746,8 +766,8 @@ public class NativeFileTest extends AndroidTestCase {
 	}
 
 	public void testFileChannelTransferFrom() {
-		String input_name = ROOT.getAbsolutePath() + "/testCopyFileChannelsFrom-input";
-		String output_name = ROOT.getAbsolutePath() + "/testCopyFileChannelsFrom-output";
+		String input_name = "/testCopyFileChannels-input";
+		String output_name = "/testCopyFileChannels-output";
 		writeRandomBytes(1000, input_name);
 		File inputFile = new File(input_name);
 		File outputFile = new File(output_name);
@@ -756,10 +776,12 @@ public class NativeFileTest extends AndroidTestCase {
 			assertTrue(inputFile.exists());
 			assertTrue(inputFile.isFile());
 
+			assertFalse(outputFile.exists());
+
 			FileInputStream source = new FileInputStream(inputFile);
 			FileOutputStream destination = new FileOutputStream(output_name);
-	        FileChannel sourceFileChannel = source.getChannel();
-	        FileChannel destinationFileChannel = destination.getChannel();
+			IOCipherFileChannel sourceFileChannel = source.getChannel();
+			IOCipherFileChannel destinationFileChannel = destination.getChannel();
 
 	        destinationFileChannel.transferFrom(sourceFileChannel, 0, sourceFileChannel.size());
 	        sourceFileChannel.close();
@@ -785,32 +807,6 @@ public class NativeFileTest extends AndroidTestCase {
 	}
 
 	@SmallTest
-	public void testFileExistingAppend() {
-		String name = randomFileName("testFileExistingAppend");
-		writeRandomBytes(500, name);
-
-		File f = new File(name);
-		assertEquals(500, f.length());
-
-		try {
-			FileOutputStream out = new FileOutputStream(f, true);
-
-			//write 2 bytes
-			out.write(1);
-			out.write(2);
-			out.close();
-
-			assertEquals(502, f.length());
-		} catch (FileNotFoundException e) {
-			Log.e(TAG, e.getCause().toString());
-			assertFalse(true);
-		} catch (IOException e) {
-			Log.e(TAG, e.getCause().toString());
-			assertFalse(true);
-		}
-	}
-
-	@SmallTest
 	public void testFileExistingTruncate() {
 		String name = randomFileName("testFileExistingTruncate");
 		writeRandomBytes(500, name);
@@ -826,7 +822,42 @@ public class NativeFileTest extends AndroidTestCase {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		}
+	}
+
+	@SmallTest
+	public void testFileExistingAppend() {
+		String name = randomFileName("testFileExistingAppend");
+		writeRandomBytes(500, name);
+		File f = new File(name);
+		byte [] orig_buf = new byte[500];
+
+		try {
+			FileInputStream in = new FileInputStream(f);
+			in.read(orig_buf, 0, 500);
+
+			assertEquals(500, f.length());
+
+			FileOutputStream out = new FileOutputStream(f, true);
+
+			//write 2 bytes
+			out.write(13);
+			out.write(42);
+			out.close();
+			assertEquals(502, f.length());
+
+			FileInputStream in2 = new FileInputStream(f);
+			byte [] test_buf = new byte[500];
+			in2.read(test_buf, 0, 500);
+			assertTrue(Arrays.equals(orig_buf, test_buf));
+			assertEquals(13, in2.read());
+			assertEquals(42, in2.read());
+		} catch (FileNotFoundException e) {
+			Log.e(TAG, e.getCause().toString());
+			assertFalse(true);
+		} catch (IOException e) {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
 		}
