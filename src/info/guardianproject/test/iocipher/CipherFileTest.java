@@ -831,19 +831,29 @@ public class CipherFileTest extends AndroidTestCase {
 	public void testFileExistingAppend() {
 		String name = randomFileName("testFileExistingAppend");
 		writeRandomBytes(500, name);
-
 		File f = new File(name);
-		assertEquals(500, f.length());
+		byte [] orig_buf = new byte[500];
 
 		try {
+			FileInputStream in = new FileInputStream(f);
+			in.read(orig_buf, 0, 500);
+
+			assertEquals(500, f.length());
+
 			FileOutputStream out = new FileOutputStream(f, true);
 
 			//write 2 bytes
-			out.write(1);
-			out.write(2);
+			out.write(13);
+			out.write(42);
 			out.close();
-
 			assertEquals(502, f.length());
+
+			FileInputStream in2 = new FileInputStream(f);
+			byte [] test_buf = new byte[500];
+			in2.read(test_buf, 0, 500);
+			assertTrue(Arrays.equals(orig_buf, test_buf));
+			assertEquals(13, in2.read());
+			assertEquals(42, in2.read());
 		} catch (FileNotFoundException e) {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
