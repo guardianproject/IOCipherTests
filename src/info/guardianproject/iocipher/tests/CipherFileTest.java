@@ -33,15 +33,15 @@ public class CipherFileTest extends AndroidTestCase {
 	protected void setUp() {
 		java.io.File db = new java.io.File(mContext.getDir("vfs",
 				Context.MODE_PRIVATE).getAbsoluteFile(), TAG + ".db");
-		if (db.exists())
+		if (db.exists()) {
+			Log.v(TAG, "Deleting existing database file: " + db.getAbsolutePath());
 			db.delete();
-		Log.v(TAG, "database file: " + db.getAbsolutePath());
-		if (db.exists())
-			Log.v(TAG, "exists: " + db.getAbsolutePath());
-		if (!db.canRead())
-			Log.v(TAG, "can't read: " + db.getAbsolutePath());
-		if (!db.canWrite())
-			Log.v(TAG, "can't write: " + db.getAbsolutePath());
+		}
+		if (db.exists()) {
+			Log.v(TAG, "Deleted file exists: " + db.getAbsolutePath());
+			fail();
+		}
+		Log.v(TAG, "Creating new database file: " + db.getAbsolutePath());
 		vfs = new VirtualFileSystem(db.getAbsolutePath());
 		vfs.mount("this is my secure password");
 		ROOT = new File("/");
