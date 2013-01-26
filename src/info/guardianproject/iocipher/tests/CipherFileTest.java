@@ -17,8 +17,6 @@ import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
-import java.util.Formatter;
-import java.util.Random;
 
 import android.content.Context;
 import android.test.AndroidTestCase;
@@ -26,46 +24,10 @@ import android.test.suitebuilder.annotation.SmallTest;
 import android.util.Log;
 
 public class CipherFileTest extends AndroidTestCase {
-	private final static String TAG = "FileTest";
+	private final static String TAG = "CipherFileTest";
 
 	private VirtualFileSystem vfs;
 	private File ROOT = null;
-
-	// Utility methods
-	private String randomFileName(String testName) {
-		String name = null;
-		do {
-			name = "/" + testName + "." + Integer.toString((int) (Math.random() * Integer.MAX_VALUE));
-		} while((new File(name)).exists());
-		return name;
-	}
-
-	private static String toHex(byte[] digest) {
-        Formatter formatter = new Formatter();
-        for (byte b : digest) {
-            formatter.format("%02x", b);
-        }
-        return formatter.toString();
-    }
-
-	private boolean writeRandomBytes(int bytes, String filename) {
-		try {
-			File f = new File(filename);
-			FileOutputStream out = new FileOutputStream(f);
-
-			Random prng = new Random();
-			byte[] random_buf = new byte[bytes];
-			prng.nextBytes(random_buf);
-
-			out.write(random_buf);
-			out.close();
-
-		} catch (IOException e) {
-			Log.e(TAG, e.getCause().toString());
-			assertFalse(true);
-		}
-		return true;
-	}
 
 	@Override
 	protected void setUp() {
@@ -297,8 +259,8 @@ public class CipherFileTest extends AndroidTestCase {
 
 	public void testNewFileRename() {
 		File root = ROOT;
-		File f = new File(randomFileName("testNewFileRename-NEW"));
-		File newf = new File(randomFileName("testNewFileRename-RENAMED"));
+		File f = new File(Util.randomFileName(ROOT, "testNewFileRename-NEW"));
+		File newf = new File(Util.randomFileName(ROOT, "testNewFileRename-RENAMED"));
 		try {
 			f.createNewFile();
 			assertTrue(f.renameTo(newf));
@@ -349,7 +311,7 @@ public class CipherFileTest extends AndroidTestCase {
 // TODO testMkdirLastModified fails
 	public void testMkdirLastModified() {
 		File root = ROOT;
-		File f = new File(randomFileName("test.iocipher.dir"));
+		File f = new File(Util.randomFileName(ROOT, "test.iocipher.dir"));
 		try {
 			long lasttime = root.lastModified();
 			Log.v(TAG, "f.lastModified: " + Long.toString(lasttime));
@@ -384,7 +346,7 @@ public class CipherFileTest extends AndroidTestCase {
 
 	public void testCreateNewFile() {
 		File root = ROOT;
-		File f = new File(randomFileName("testCreateNewFile"));
+		File f = new File(Util.randomFileName(ROOT, "testCreateNewFile"));
 		try {
 			assertFalse(f.exists());
 			f.createNewFile();
@@ -405,7 +367,7 @@ public class CipherFileTest extends AndroidTestCase {
 
 	public void testWriteNewFile() {
 		File root = ROOT;
-		File f = new File(randomFileName("testWriteNewFile"));
+		File f = new File(Util.randomFileName(ROOT, "testWriteNewFile"));
 		try {
 			assertTrue(root.isDirectory());
 			assertFalse(f.exists());
@@ -430,7 +392,7 @@ public class CipherFileTest extends AndroidTestCase {
 	public void testWriteByteInNewFileThenRead() {
 		byte testValue = 43;
 		File root = ROOT;
-		File f = new File(randomFileName("testWriteNewFile"));
+		File f = new File(Util.randomFileName(ROOT, "testWriteNewFile"));
 		try {
 			assertTrue(root.isDirectory());
 			assertFalse(f.exists());
@@ -454,7 +416,7 @@ public class CipherFileTest extends AndroidTestCase {
 
 	public void testWriteTextInNewFileThenReadByByte() {
 		String testString = "this is a test of IOCipher!";
-		File f = new File(randomFileName("testWriteTextInNewFileThenReadByByte"));
+		File f = new File(Util.randomFileName(ROOT, "testWriteTextInNewFileThenReadByByte"));
 		try {
 			assertFalse(f.exists());
 			BufferedWriter out = new BufferedWriter(new FileWriter(f));
@@ -479,7 +441,7 @@ public class CipherFileTest extends AndroidTestCase {
 
 	public void testWriteTextInNewFileThenReadIntoByteArray() {
 		String testString = "this is a test of IOCipher!";
-		File f = new File(randomFileName("testWriteTextInNewFileThenReadIntoByteArray"));
+		File f = new File(Util.randomFileName(ROOT, "testWriteTextInNewFileThenReadIntoByteArray"));
 		try {
 			assertFalse(f.exists());
 			BufferedWriter out = new BufferedWriter(new FileWriter(f));
@@ -504,7 +466,7 @@ public class CipherFileTest extends AndroidTestCase {
 
 	public void testWriteTextInNewFileThenReadOneByteByByte() {
 		String testString = "01234567890abcdefgh";
-		File f = new File(randomFileName("testWriteTextInNewFileThenReadOneByteByByte."));
+		File f = new File(Util.randomFileName(ROOT, "testWriteTextInNewFileThenReadOneByteByByte."));
 		try {
 			assertFalse(f.exists());
 			BufferedWriter out = new BufferedWriter(new FileWriter(f));
@@ -539,7 +501,7 @@ public class CipherFileTest extends AndroidTestCase {
 
 	public void testWriteTextInNewFileThenCheckSize() {
 		String testString = "01234567890abcdefgh";
-		File f = new File(randomFileName("testWriteTextInNewFileThenCheckSize"));
+		File f = new File(Util.randomFileName(ROOT, "testWriteTextInNewFileThenCheckSize"));
 		try {
 			assertFalse(f.exists());
 			BufferedWriter out = new BufferedWriter(new FileWriter(f));
@@ -562,7 +524,7 @@ public class CipherFileTest extends AndroidTestCase {
 
 	public void testWriteTextInNewFileThenSkipAndRead() {
 		String testString = "01234567890abcdefghijklmnopqrstuvxyz";
-		File f = new File(randomFileName("testWriteTextInNewFileThenSkipAndRead"));
+		File f = new File(Util.randomFileName(ROOT, "testWriteTextInNewFileThenSkipAndRead"));
 		try {
 			assertFalse(f.exists());
 			BufferedWriter out = new BufferedWriter(new FileWriter(f));
@@ -595,7 +557,7 @@ public class CipherFileTest extends AndroidTestCase {
 	public void testWriteRepeat() {
 		int i, repeat = 1000;
 		String testString = "01234567890abcdefghijklmnopqrstuvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\n";
-		File f = new File(randomFileName("testWriteRepeat"));
+		File f = new File(Util.randomFileName(ROOT, "testWriteRepeat"));
 		try {
 			assertFalse(f.exists());
 			BufferedWriter out = new BufferedWriter(new FileWriter(f));
@@ -619,7 +581,7 @@ public class CipherFileTest extends AndroidTestCase {
 		int skip = 100;
 		String testString = "the best of times\n";
 		String testString2 = "the worst of times\n";
-		File f = new File(randomFileName("testWriteSkipWrite"));
+		File f = new File(Util.randomFileName(ROOT, "testWriteSkipWrite"));
 		try {
 			assertFalse(f.exists());
 			RandomAccessFile inout = new RandomAccessFile(f, "rw");
@@ -653,7 +615,7 @@ public class CipherFileTest extends AndroidTestCase {
 
 	public void testWriteTextInNewFileThenFileInputStream() {
 		String testString = "01234567890abcdefgh";
-		File f = new File(randomFileName("testWriteTextInNewFileThenFileInputStream"));
+		File f = new File(Util.randomFileName(ROOT, "testWriteTextInNewFileThenFileInputStream"));
 		try {
 			assertFalse(f.exists());
 			BufferedWriter out = new BufferedWriter(new FileWriter(f));
@@ -676,7 +638,7 @@ public class CipherFileTest extends AndroidTestCase {
 
 	public void testWriteManyLinesInNewFileThenFileInputStream() {
 		String testString = "01234567890abcdefghijklmnopqrstuvwxyz";
-		File f = new File(randomFileName("testWriteManyLinesInNewFileThenFileInputStream"));
+		File f = new File(Util.randomFileName(ROOT, "testWriteManyLinesInNewFileThenFileInputStream"));
 		try {
 			assertFalse(f.exists());
 			BufferedWriter out = new BufferedWriter(new FileWriter(f));
@@ -727,7 +689,7 @@ public class CipherFileTest extends AndroidTestCase {
 	public void testFileChannelTransferTo() {
 		String input_name = "/testCopyFileChannels-input";
 		String output_name = "/testCopyFileChannels-output";
-		writeRandomBytes(1000, input_name);
+		assertTrue(Util.cipherWriteRandomBytes(1000, input_name));
 		File inputFile = new File(input_name);
 		File outputFile = new File(output_name);
 
@@ -753,7 +715,7 @@ public class CipherFileTest extends AndroidTestCase {
 			byte[] expected = digest(inputFile);
 			byte[] actual = digest(outputFile);
 
-			Log.i(TAG, "file hashes:" + toHex(expected) +"    "+ toHex(actual));
+			Log.i(TAG, "file hashes:" + Util.toHex(expected) +"    "+ Util.toHex(actual));
 			assertTrue( Arrays.equals(expected, actual));
 
 		} catch (ExceptionInInitializerError e) {
@@ -768,7 +730,7 @@ public class CipherFileTest extends AndroidTestCase {
 	public void testFileChannelTransferFrom() {
 		String input_name = "/testCopyFileChannels-input";
 		String output_name = "/testCopyFileChannels-output";
-		writeRandomBytes(1000, input_name);
+		assertTrue(Util.cipherWriteRandomBytes(1000, input_name));
 		File inputFile = new File(input_name);
 		File outputFile = new File(output_name);
 
@@ -794,7 +756,7 @@ public class CipherFileTest extends AndroidTestCase {
 			byte[] expected = digest(inputFile);
 			byte[] actual = digest(outputFile);
 
-			Log.i(TAG, "file hashes:" + toHex(expected) +"    "+ toHex(actual));
+			Log.i(TAG, "file hashes:" + Util.toHex(expected) +"    "+ Util.toHex(actual));
 			assertTrue( Arrays.equals(expected, actual));
 
 		} catch (ExceptionInInitializerError e) {
@@ -808,8 +770,8 @@ public class CipherFileTest extends AndroidTestCase {
 
 	@SmallTest
 	public void testFileExistingTruncate() {
-		String name = randomFileName("testFileExistingTruncate");
-		writeRandomBytes(500, name);
+		String name = Util.randomFileName(ROOT, "testFileExistingTruncate");
+		assertTrue(Util.cipherWriteRandomBytes(500, name));
 
 		File f = new File(name);
 		assertEquals(500, f.length());
@@ -829,8 +791,8 @@ public class CipherFileTest extends AndroidTestCase {
 
 	@SmallTest
 	public void testFileExistingAppend() {
-		String name = randomFileName("testFileExistingAppend");
-		writeRandomBytes(500, name);
+		String name = Util.randomFileName(ROOT, "testFileExistingAppend");
+		assertTrue(Util.cipherWriteRandomBytes(500, name));
 		File f = new File(name);
 		byte [] orig_buf = new byte[500];
 
@@ -867,7 +829,7 @@ public class CipherFileTest extends AndroidTestCase {
 		byte testValue = 43;
 		byte secondTestValue = 100;
 		File root = ROOT;
-		File f = new File(randomFileName("testWriteByteInExistingFileThenRead"));
+		File f = new File(Util.randomFileName(ROOT, "testWriteByteInExistingFileThenRead"));
 		try {
 			assertTrue(root.isDirectory());
 			assertFalse(f.exists());
