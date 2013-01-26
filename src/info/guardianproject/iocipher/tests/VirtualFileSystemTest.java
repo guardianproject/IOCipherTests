@@ -10,6 +10,8 @@ public class VirtualFileSystemTest extends AndroidTestCase {
 	private final static String TAG = "VirtualFileSystemTest";
 
 	private VirtualFileSystem vfs;
+	private String goodPassword = "this is the right password";
+	private String badPassword = "this soooo not the right password, its wrong";
 
 	protected void setUp() {
 		java.io.File db = new java.io.File(mContext.getDir("vfs",
@@ -23,7 +25,7 @@ public class VirtualFileSystemTest extends AndroidTestCase {
 	}
 
 	public void testInitMountUnmount() {
-		vfs.mount();
+		vfs.mount(goodPassword);
 		if (vfs.isMounted()) {
 			Log.i(TAG, "vfs is mounted");
 		} else {
@@ -34,7 +36,7 @@ public class VirtualFileSystemTest extends AndroidTestCase {
 	}
 
 	public void testInitMountMkdirUnmount() {
-		vfs.mount();
+		vfs.mount(goodPassword);
 		if (vfs.isMounted()) {
 			Log.i(TAG, "vfs is mounted");
 		} else {
@@ -46,7 +48,7 @@ public class VirtualFileSystemTest extends AndroidTestCase {
 	}
 
 	public void testMountCreateUnmountMountExists() {
-		vfs.mount();
+		vfs.mount(goodPassword);
 		File f = new File("/testMountCreateUnmountMountExists."
 				+ Integer.toString((int) (Math.random() * 1024)));
 		try {
@@ -56,20 +58,20 @@ public class VirtualFileSystemTest extends AndroidTestCase {
 			assertFalse(true);
 		}
 		vfs.unmount();
-		vfs.mount();
+		vfs.mount(goodPassword);
 		assertTrue(f.exists());
 		vfs.unmount();
 	}
 
 	public void testMountKeyWithBadPassword() {
-		vfs.mount("this is my password");
+		vfs.mount(goodPassword);
 		File d = new File("/");
 		for (String f : d.list()) {
 			Log.v(TAG, "file: " + f);
 		}
 		vfs.unmount();
 		try {
-			vfs.mount("this is the WRONG password");
+			vfs.mount(badPassword);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return;
