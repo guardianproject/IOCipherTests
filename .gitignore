@@ -2,7 +2,6 @@
 bin/
 gen/
 # Android local config
-ant.properties
 build.xml
 coverage.em
 local.properties
