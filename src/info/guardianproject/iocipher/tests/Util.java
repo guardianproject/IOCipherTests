@@ -1,14 +1,12 @@
 package info.guardianproject.iocipher.tests;
 
+import android.util.Log;
+
 import java.io.File;
 import java.io.FileOutputStream;
-
 import java.io.IOException;
 import java.util.Formatter;
 import java.util.Random;
-
-import android.util.Log;
-
 public class Util {
 	private final static String TAG = "Util";
 

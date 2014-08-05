@@ -1,10 +1,11 @@
 package info.guardianproject.iocipher.tests;
 
-import info.guardianproject.iocipher.File;
-import info.guardianproject.iocipher.VirtualFileSystem;
 import android.content.Context;
 import android.test.AndroidTestCase;
 import android.util.Log;
+
+import info.guardianproject.iocipher.File;
+import info.guardianproject.iocipher.VirtualFileSystem;
 
 public class VirtualFileSystemTest extends AndroidTestCase {
 	private final static String TAG = "VirtualFileSystemTest";
