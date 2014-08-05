@@ -29,7 +29,9 @@ public class Util {
 		for (byte b : digest) {
 			formatter.format("%02x", b);
 		}
-		return formatter.toString();
+		String ret = formatter.toString();
+		formatter.close();
+		return ret;
 	}
 
 	static boolean nativeWriteRandomBytes(int bytes, String filename) {

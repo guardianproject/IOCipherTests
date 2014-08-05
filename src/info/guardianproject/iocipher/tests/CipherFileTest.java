@@ -405,6 +405,7 @@ public class CipherFileTest extends AndroidTestCase {
 			int b = in.read();
 			Log.v(TAG, "read: " + Integer.toString(b));
 			assertTrue(b == testValue);
+			in.close();
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
@@ -430,6 +431,7 @@ public class CipherFileTest extends AndroidTestCase {
 			String dataString = new String(data);
 			Log.v(TAG, "read: " + dataString);
 			assertTrue(dataString.equals(testString));
+			in.close();
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
@@ -455,6 +457,7 @@ public class CipherFileTest extends AndroidTestCase {
 			assertTrue(ret == data.length);
 			String dataString = new String(data);
 			assertTrue(dataString.equals(testString));
+			in.close();
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
@@ -490,6 +493,7 @@ public class CipherFileTest extends AndroidTestCase {
 			String dataString = new String(data);
 			Log.v(TAG, "read: " + dataString);
 			assertTrue(dataString.equals(testString));
+			in.close();
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
@@ -513,6 +517,7 @@ public class CipherFileTest extends AndroidTestCase {
 			IOCipherFileChannel channel = in.getChannel();
 			assertTrue(channel.size() == testString.length());
 			assertTrue(testString.length() == f.length());
+			in.close();
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
@@ -545,6 +550,7 @@ public class CipherFileTest extends AndroidTestCase {
 			Log.v(TAG,"c: " + c + "  testString.charAt(27): "
 							+ testString.charAt(27));
 			assertTrue(c == testString.charAt(27));
+			in.close();
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
@@ -627,6 +633,7 @@ public class CipherFileTest extends AndroidTestCase {
 			String tmp = in.readLine();
 			Log.v(TAG, "in.readline(): " + tmp);
 			assertTrue(testString.equals(tmp));
+			in.close();
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
@@ -653,6 +660,7 @@ public class CipherFileTest extends AndroidTestCase {
 				Log.v(TAG, "in.readline(): " + tmp);
 				assertTrue(testString.equals(tmp));
 			}
+			in.close();
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
@@ -718,6 +726,8 @@ public class CipherFileTest extends AndroidTestCase {
 			Log.i(TAG, "file hashes:" + Util.toHex(expected) +"    "+ Util.toHex(actual));
 			assertTrue( Arrays.equals(expected, actual));
 
+            source.close();
+            destination.close();
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
@@ -759,6 +769,8 @@ public class CipherFileTest extends AndroidTestCase {
 			Log.i(TAG, "file hashes:" + Util.toHex(expected) +"    "+ Util.toHex(actual));
 			assertTrue( Arrays.equals(expected, actual));
 
+			source.close();
+			destination.close();
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
@@ -816,6 +828,8 @@ public class CipherFileTest extends AndroidTestCase {
 			assertTrue(Arrays.equals(orig_buf, test_buf));
 			assertEquals(13, in2.read());
 			assertEquals(42, in2.read());
+            in.close();
+            in2.close();
 		} catch (FileNotFoundException e) {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);

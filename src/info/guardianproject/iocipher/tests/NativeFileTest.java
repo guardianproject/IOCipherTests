@@ -381,6 +381,7 @@ public class NativeFileTest extends AndroidTestCase {
 			int b = in.read();
 			Log.v(TAG, "read: " + Integer.toString(b));
 			assertTrue(b == testValue);
+			in.close();
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
@@ -406,6 +407,7 @@ public class NativeFileTest extends AndroidTestCase {
 			String dataString = new String(data);
 			Log.v(TAG, "read: " + dataString);
 			assertTrue(dataString.equals(testString));
+			in.close();
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
@@ -431,6 +433,7 @@ public class NativeFileTest extends AndroidTestCase {
 			assertTrue(ret == data.length);
 			String dataString = new String(data);
 			assertTrue(dataString.equals(testString));
+			in.close();
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
@@ -466,6 +469,7 @@ public class NativeFileTest extends AndroidTestCase {
 			String dataString = new String(data);
 			Log.v(TAG, "read: " + dataString);
 			assertTrue(dataString.equals(testString));
+			in.close();
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
@@ -489,6 +493,7 @@ public class NativeFileTest extends AndroidTestCase {
 			FileChannel channel = in.getChannel();
 			assertTrue(channel.size() == testString.length());
 			assertTrue(testString.length() == f.length());
+			in.close();
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
@@ -521,6 +526,7 @@ public class NativeFileTest extends AndroidTestCase {
 			Log.v(TAG,"c: " + c + "  testString.charAt(27): "
 							+ testString.charAt(27));
 			assertTrue(c == testString.charAt(27));
+			in.close();
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
@@ -603,6 +609,7 @@ public class NativeFileTest extends AndroidTestCase {
 			String tmp = in.readLine();
 			Log.v(TAG, "in.readline(): " + tmp);
 			assertTrue(testString.equals(tmp));
+			in.close();
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
@@ -629,6 +636,7 @@ public class NativeFileTest extends AndroidTestCase {
 				Log.v(TAG, "in.readline(): " + tmp);
 				assertTrue(testString.equals(tmp));
 			}
+			in.close();
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
@@ -692,6 +700,8 @@ public class NativeFileTest extends AndroidTestCase {
 			Log.i(TAG, "file hashes:" + Util.toHex(expected) +"    "+ Util.toHex(actual));
 			assertTrue( Arrays.equals(expected, actual));
 
+            source.close();
+            destination.close();
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
@@ -731,6 +741,8 @@ public class NativeFileTest extends AndroidTestCase {
 			Log.i(TAG, "file hashes:" + Util.toHex(expected) +"    "+ Util.toHex(actual));
 			assertTrue( Arrays.equals(expected, actual));
 
+            source.close();
+            destination.close();
 		} catch (ExceptionInInitializerError e) {
 			Log.e(TAG, e.getCause().toString());
 			assertFalse(true);
