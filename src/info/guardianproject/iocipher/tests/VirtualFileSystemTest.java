@@ -44,12 +44,13 @@ public class VirtualFileSystemTest extends AndroidTestCase {
 
     @Override
     protected void setUp() {
-        java.io.File db = new java.io.File(mContext.getDir("vfs",
-                Context.MODE_PRIVATE).getAbsoluteFile(), TAG + ".db");
+        String path = mContext.getDir("vfs", Context.MODE_PRIVATE).getAbsolutePath()
+                + "/" + TAG + ".db";
+        java.io.File db = new java.io.File(path);
         if (db.exists())
             db.delete();
         vfs = VirtualFileSystem.get();
-        vfs.setContainer(db);
+        vfs.setContainerPath(path);
     }
 
     @Override

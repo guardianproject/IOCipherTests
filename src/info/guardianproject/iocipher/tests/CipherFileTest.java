@@ -32,8 +32,9 @@ public class CipherFileTest extends AndroidTestCase {
 
     @Override
     protected void setUp() {
-        java.io.File db = new java.io.File(mContext.getDir("vfs",
-                Context.MODE_PRIVATE).getAbsoluteFile(), TAG + ".db");
+        String path = mContext.getDir("vfs", Context.MODE_PRIVATE).getAbsolutePath()
+                + "/" + TAG + ".db";
+        java.io.File db = new java.io.File(path);
         if (db.exists()) {
             Log.v(TAG, "Deleting existing database file: " + db.getAbsolutePath());
             db.delete();
@@ -44,7 +45,7 @@ public class CipherFileTest extends AndroidTestCase {
         }
         Log.v(TAG, "Creating new database file: " + db.getAbsolutePath());
         vfs = VirtualFileSystem.get();
-        vfs.setContainer(db);
+        vfs.setContainerPath(path);
         Log.v(TAG, "Mounting:");
         vfs.mount("this is my secure password");
         ROOT = new File("/");
