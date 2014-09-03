@@ -22,7 +22,7 @@ public class VirtualFileSystemTest extends AndroidTestCase {
             (byte) 0xb1, (byte) 0x90, (byte) 0x51, (byte) 0x15, (byte) 0xbf, (byte) 0xc3,
             (byte) 0xb2, (byte) 0x8d,
     };
-    private byte[] longKey = {
+    private byte[] tooLongKey = {
             (byte) 0x2a, (byte) 0xfc, (byte) 0x69, (byte) 0xa1, (byte) 0x16, (byte) 0x40,
             (byte) 0x4f, (byte) 0x7d, (byte) 0x7f, (byte) 0x1b, (byte) 0x1d, (byte) 0xb9,
             (byte) 0x5e, (byte) 0x18, (byte) 0x11, (byte) 0x2e, (byte) 0x6b, (byte) 0x3c,
@@ -30,7 +30,7 @@ public class VirtualFileSystemTest extends AndroidTestCase {
             (byte) 0xb1, (byte) 0x90, (byte) 0x51, (byte) 0x15, (byte) 0xbf, (byte) 0xc3,
             (byte) 0xb2, (byte) 0x8d, (byte) 0x00
     };
-    private byte[] shortKey = {
+    private byte[] tooShortKey = {
             (byte) 0x2a, (byte) 0xfc, (byte) 0x69, (byte) 0xa1, (byte) 0x16, (byte) 0x40,
             (byte) 0x4f, (byte) 0x7d, (byte) 0x7f, (byte) 0x1b, (byte) 0x1d, (byte) 0xb9,
             (byte) 0x5e, (byte) 0x18, (byte) 0x11, (byte) 0x2e, (byte) 0x6b, (byte) 0x3c,
@@ -134,9 +134,9 @@ public class VirtualFileSystemTest extends AndroidTestCase {
         fail();
     }
 
-    public void testMountKeyWithLongKey() {
+    public void testMountKeyWithTooLongKey() {
         Log.i(TAG, "goodKey length: " + goodKey.length);
-        Log.i(TAG, "longKey length: " + longKey.length);
+        Log.i(TAG, "tooLongKey length: " + tooLongKey.length);
         vfs.mount(goodKey);
         File d = new File("/");
         for (String f : d.list()) {
@@ -144,7 +144,7 @@ public class VirtualFileSystemTest extends AndroidTestCase {
         }
         vfs.unmount();
         try {
-            vfs.mount(longKey);
+            vfs.mount(tooLongKey);
         } catch (Exception e) {
             e.printStackTrace();
             return;
@@ -154,9 +154,9 @@ public class VirtualFileSystemTest extends AndroidTestCase {
         fail();
     }
 
-    public void testMountKeyWithShortKey() {
+    public void testMountKeyWithTooShortKey() {
         Log.i(TAG, "goodKey length: " + goodKey.length);
-        Log.i(TAG, "shortKey length: " + shortKey.length);
+        Log.i(TAG, "tooShortKey length: " + tooShortKey.length);
         vfs.mount(goodKey);
         File d = new File("/");
         for (String f : d.list()) {
@@ -164,7 +164,7 @@ public class VirtualFileSystemTest extends AndroidTestCase {
         }
         vfs.unmount();
         try {
-            vfs.mount(shortKey);
+            vfs.mount(tooShortKey);
         } catch (Exception e) {
             e.printStackTrace();
             return;
