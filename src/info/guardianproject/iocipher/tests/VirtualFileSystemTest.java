@@ -109,7 +109,11 @@ public class VirtualFileSystemTest extends AndroidTestCase {
             e.printStackTrace();
             return;
         } finally {
-            vfs.unmount();
+            try {
+                vfs.unmount();
+            } catch (IllegalStateException e) {
+                // was not mounted, ignore
+            }
         }
         fail();
     }
@@ -129,7 +133,11 @@ public class VirtualFileSystemTest extends AndroidTestCase {
             e.printStackTrace();
             return;
         } finally {
-            vfs.unmount();
+            try {
+                vfs.unmount();
+            } catch (IllegalStateException e) {
+                // was not mounted, ignore
+            }
         }
         fail();
     }
@@ -149,7 +157,11 @@ public class VirtualFileSystemTest extends AndroidTestCase {
             e.printStackTrace();
             return;
         } finally {
-            vfs.unmount();
+            try {
+                vfs.unmount();
+            } catch (IllegalStateException e) {
+                // was not mounted, ignore
+            }
         }
         fail();
     }
@@ -169,7 +181,11 @@ public class VirtualFileSystemTest extends AndroidTestCase {
             e.printStackTrace();
             return;
         } finally {
-            vfs.unmount();
+            try {
+                vfs.unmount();
+            } catch (IllegalStateException e) {
+                // was not mounted, ignore
+            }
         }
         fail();
     }
@@ -192,7 +208,11 @@ public class VirtualFileSystemTest extends AndroidTestCase {
             e.printStackTrace();
             return;
         } finally {
-            vfs.unmount();
+            try {
+                vfs.unmount();
+            } catch (IllegalStateException e) {
+                // was not mounted, ignore
+            }
         }
         fail();
     }
