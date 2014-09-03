@@ -29,6 +29,7 @@ public class CipherFileTest extends AndroidTestCase {
 
     private VirtualFileSystem vfs;
     private File ROOT = null;
+    private final String goodPassword = "this is my secure password";
 
     @Override
     protected void setUp() {
@@ -47,7 +48,7 @@ public class CipherFileTest extends AndroidTestCase {
         vfs = VirtualFileSystem.get();
         vfs.setContainerPath(path);
         Log.v(TAG, "Mounting:");
-        vfs.mount("this is my secure password");
+        vfs.mount(goodPassword);
         ROOT = new File("/");
     }
 
@@ -646,6 +647,49 @@ public class CipherFileTest extends AndroidTestCase {
             for (int i = 0; i < 25; i++) {
                 String tmp = in.readLine();
                 Log.v(TAG, "in.readline(): " + tmp);
+                assertTrue(testString.equals(tmp));
+            }
+            in.close();
+        } catch (ExceptionInInitializerError e) {
+            Log.e(TAG, e.getCause().toString());
+            assertFalse(true);
+        } catch (IOException e) {
+            Log.e(TAG, e.getCause().toString());
+            assertFalse(true);
+        }
+    }
+
+    public void testWriteAndReadAfterAlreadyMountedException() {
+        String testString = "01234567890abcdefghijklmnopqrstuvwxyz";
+        File f = new File(Util.randomFileName(ROOT,
+                "testWriteAndReadAfterAlreadyMountedException"));
+        try {
+            assertFalse(f.exists());
+            BufferedWriter out = new BufferedWriter(new FileWriter(f));
+            for (int i = 0; i < 100; i++) {
+                out.write(testString + "\n");
+                try {
+                    vfs.mount(goodPassword);
+                    fail();
+                } catch (IllegalStateException e) {
+                    // this is what we want, its already mounted
+                }
+                assertTrue(vfs.isMounted());
+            }
+            out.close();
+            assertTrue(f.exists());
+            assertTrue(f.isFile());
+            BufferedReader in = new BufferedReader(new FileReader(f));
+            for (int i = 0; i < 100; i++) {
+                String tmp = in.readLine();
+                Log.v(TAG, "in.readline(): " + tmp);
+                try {
+                    vfs.mount(goodPassword);
+                    fail();
+                } catch (IllegalStateException e) {
+                    // this is what we want, its already mounted
+                }
+                assertTrue(vfs.isMounted());
                 assertTrue(testString.equals(tmp));
             }
             in.close();
