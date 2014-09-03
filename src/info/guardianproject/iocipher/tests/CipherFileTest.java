@@ -638,13 +638,13 @@ public class CipherFileTest extends AndroidTestCase {
         try {
             assertFalse(f.exists());
             BufferedWriter out = new BufferedWriter(new FileWriter(f));
-            for (int i = 0; i < 25; i++)
+            for (int i = 0; i < 1000; i++)
                 out.write(testString + "\n");
             out.close();
             assertTrue(f.exists());
             assertTrue(f.isFile());
             BufferedReader in = new BufferedReader(new FileReader(f));
-            for (int i = 0; i < 25; i++) {
+            for (int i = 0; i < 1000; i++) {
                 String tmp = in.readLine();
                 Log.v(TAG, "in.readline(): " + tmp);
                 assertTrue(testString.equals(tmp));
@@ -816,10 +816,10 @@ public class CipherFileTest extends AndroidTestCase {
     @SmallTest
     public void testFileExistingTruncate() {
         String name = Util.randomFileName(ROOT, "testFileExistingTruncate");
-        assertTrue(Util.cipherWriteRandomBytes(500, name));
+        assertTrue(Util.cipherWriteRandomBytes(50000, name));
 
         File f = new File(name);
-        assertEquals(500, f.length());
+        assertEquals(50000, f.length());
 
         try {
             FileOutputStream out = new FileOutputStream(f);
